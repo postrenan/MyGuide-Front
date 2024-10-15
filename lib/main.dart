@@ -3,7 +3,7 @@ import 'package:myguide_app/src/features/authentication/screens/login_page.dart'
 /*import 'package:myguide_app/src/features/authentication/screens/register_page.dart';*/
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
