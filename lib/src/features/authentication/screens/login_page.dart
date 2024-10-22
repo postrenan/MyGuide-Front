@@ -25,7 +25,7 @@ class LoginPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 32,
                     fontStyle: FontStyle.italic,
-                    color: Colors.black,
+                    color: primaryColor,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -34,12 +34,12 @@ class LoginPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 50.0),
                   child: Text(
                     "Discover the charm of local shops and hidden gems with our innovative app designed to enhance your shopping experience.",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: primaryColor),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextButton(
+                TextButton(                   
                   style: TextButton.styleFrom(
                     backgroundColor: secundaryColor,
                     shape: RoundedRectangleBorder(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
+import 'package:myguide_app/src/features/authentication/screens/register_shop.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,6 +16,9 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar( 
+        leading: BackButton(), 
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -26,7 +30,22 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: primaryColor,
+                ),
+              ),
+              InkWell(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegisterShop()),
+                  );
+                },
+                child: const Text(
+                  'Are you a shop owner?',
+                  style: TextStyle(
+                  color: secundaryColor,
+                  decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -49,7 +68,7 @@ class _RegisterPageState extends State<RegisterPage> {
               }),
               const SizedBox(height: 40),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {}, //cadastro------------------------
                 style: ElevatedButton.styleFrom(
                   backgroundColor: secundaryColor,
                   padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
