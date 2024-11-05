@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/screens/register_shop.dart';
+import 'package:myguide_app/src/features/authentication/screens/login_page.dart'; // Adicione a importação da página de login
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -57,6 +58,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (response.statusCode == 200) {
         _showMessage('Account created successfully');
+        // Redireciona para a página de login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
       } else if (response.statusCode == 400) {
         _showMessage('Invalid data. Please check your inputs.');
       } else {
