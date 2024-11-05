@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
+        leading: const BackButton(),
       ),
       body: Center(
         child: Padding(
@@ -70,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterShop()),
+                    MaterialPageRoute(builder: (context) => const RegisterShop()),
                   );
                 },
                 child: const Text(
