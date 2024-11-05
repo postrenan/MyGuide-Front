@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 
 class RegisterShop extends StatefulWidget {
-  const RegisterShop({Key? key}) : super(key: key);
+  const RegisterShop({super.key});
 
   @override
   _RegisterShopState createState() => _RegisterShopState();
@@ -16,7 +16,7 @@ class _RegisterShopState extends State<RegisterShop> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar( 
-        leading: BackButton(), 
+        leading: const BackButton(), 
       ),
       body: Center(
         child: Padding(
