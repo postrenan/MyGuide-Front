@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/screens/register_shop.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
@@ -21,29 +20,68 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController = TextEditingController();
 
   Future<void> _createCredentials() async {
-    final response = await http.post(
-      Uri.parse('https://myguide-api.renanbick.com/users'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': _emailController.text,
-        'name': _nameController.text,
-        'username': _usernameController.text,
-        'birthday': _birthdayController.text,
-        'password': _passwordController.text,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Sucesso na requisição
-      print('Credenciais criadas: ${response.body}');
-    } else {
-      // Falha na requisição
-      print('Erro: ${response.statusCode}');
+    // Verificação de campos obrigatórios
+    if (_emailController.text.isEmpty ||
+        _nameController.text.isEmpty ||
+        _usernameController.text.isEmpty ||
+        _birthdayController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _repeatPasswordController.text.isEmpty) {
+      _showMessage('Please fill all fields');
+      return;
     }
+
+    // Verificação se as senhas coincidem
+    if (_passwordController.text != _repeatPasswordController.text) {
+      _showMessage('Passwords do not match');
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://myguide-api.renanbick.com/users'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'email': _emailController.text,
+          'name': _nameController.text,
+          'username': _usernameController.text,
+          'birthday': _birthdayController.text,
+          'password': _passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        _showMessage('Account created successfully');
+      } else if (response.statusCode == 400) {
+        _showMessage('Invalid data. Please check your inputs.');
+      } else {
+        _showMessage('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showMessage('An error occurred. Please try again.');
+    }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _nameController.dispose();
+    _usernameController.dispose();
+    _birthdayController.dispose();
+    _passwordController.dispose();
+    _repeatPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,7 +138,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 setState(() {
                   _isRepeatPasswordVisible = !_isRepeatPasswordVisible;
                 });
-              }, _passwordController),
+              }, _repeatPasswordController),
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
