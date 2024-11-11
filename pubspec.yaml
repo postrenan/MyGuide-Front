@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   http: ^1.2.2
+  carousel_slider: ^5.0.0
+  google_fonts: ^4.0.4
   flutter_dotenv: ^5.2.1
 
 dev_dependencies:
@@ -22,5 +24,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/welcome_images/myguide.jpg
+    - assets/images/welcome_images/myguide.png
+    - assets/images/home/my.png
     - .env

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/screens/register_page.dart';
+import 'package:myguide_app/src/features/home/screens/homepage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class LoginPage extends StatelessWidget {
@@ -20,11 +22,10 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
+                 Text(
                   "Find your next souvenir",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontStyle: FontStyle.italic,
+                  style: GoogleFonts.italianno(
+                    fontSize: 45,
                     color: primaryColor,
                   ),
                   textAlign: TextAlign.center,
@@ -38,8 +39,8 @@ class LoginPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 20),
-                TextButton(                   
+                const SizedBox(height: 30),
+                TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: secundaryColor,
                     shape: RoundedRectangleBorder(
@@ -49,12 +50,12 @@ class LoginPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const RegisterPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterPage()),
                     );
                   },
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 11),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 11),
                     child: Text(
                       "Don't have an account? Create",
                       style: TextStyle(color: Colors.white),
@@ -76,7 +77,7 @@ class LoginPage extends StatelessWidget {
                   width: 100,
                   height: 100,
                   child: Image.asset(
-                    'assets/images/welcome_images/myguide.jpg',
+                    'assets/images/welcome_images/myguide.png',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -127,7 +128,8 @@ class LoginPage extends StatelessWidget {
                         );
                       },
                     ),
-                    const Text('remember me?', style: TextStyle(color: Colors.black)),
+                    const Text('remember me?',
+                        style: TextStyle(color: Colors.black)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -137,13 +139,26 @@ class LoginPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 130, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 130, vertical: 20),
                   ),
                   onPressed: () {
-                    
+                    bool loginSuccessful = true; //login -------------------
+
+                    if (loginSuccessful) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HomePage()),
+                      );
+                    }else{
+                       ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Login failed. Please try again.')),
+                      );
+                    }
                   },
-                  child: const Text('Login', style: TextStyle(color: Colors.white)),
+                  child: const Text('Login',
+                      style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
