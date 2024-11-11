@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/screens/register_shop.dart';
 import 'package:myguide_app/src/features/authentication/screens/login_page.dart'; // Adicione a importação da página de login
@@ -42,8 +43,10 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
+      String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
+
       final response = await http.post(
-        Uri.parse('https://myguide-api.renanbick.com/users'),
+        Uri.parse( '${apiKey}users'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
