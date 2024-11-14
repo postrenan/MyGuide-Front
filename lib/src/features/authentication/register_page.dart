@@ -53,12 +53,13 @@ class _RegisterPageState extends State<RegisterPage> {
           'email': _emailController.text,
           'name': _nameController.text,
           'username': _usernameController.text,
-          'birthday': _birthdayController.text, 
+          'birthday': _birthdayController.text,
           'password': _passwordController.text,
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
+        // Mostra o Toast de sucesso
         Fluttertoast.showToast(
           msg: "Account created successfully",
           toastLength: Toast.LENGTH_SHORT,
@@ -74,6 +75,16 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       } else if (response.statusCode == 400) {
         _showMessage('Invalid data. Please check your inputs.');
+      } else if (response.statusCode == 500) {
+        // Mostra o Toast de erro
+        Fluttertoast.showToast(
+          msg: "Server error. Please try again later.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       } else {
         _showMessage('Error: ${response.statusCode}');
       }
@@ -97,7 +108,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
     if (picked != null && picked != DateTime.now()) {
       setState(() {
-        // Formato da data alterado para `1990-01-01T00:00:00.000Z`
         _birthdayController.text = picked.toUtc().toIso8601String();
       });
     }
@@ -176,9 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
               }, _repeatPasswordController),
               const SizedBox(height: 40),
               ElevatedButton(
-                onPressed: () {
-                  _createCredentials();
-                },
+                onPressed: _createCredentials,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: secundaryColor,
                   padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
