@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/register_shop.dart';
-import 'package:myguide_app/src/features/authentication/login_page.dart'; // Adicione a importação da página de login
+import 'package:myguide_app/src/features/authentication/login_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart'; // Importação do pacote fluttertoast
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -47,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
       String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
 
       final response = await http.post(
-        Uri.parse( '${apiKey}users'),
+        Uri.parse('${apiKey}users'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -55,13 +56,22 @@ class _RegisterPageState extends State<RegisterPage> {
           'email': _emailController.text,
           'name': _nameController.text,
           'username': _usernameController.text,
-          'birthday': _birthdayController.text, // Data formatada
+          'birthday':"1990-01-01T00:00:00.000Z", 
           'password': _passwordController.text,
         }),
       );
 
       if (response.statusCode == 200) {
-        _showMessage('Account created successfully');
+        // Notificação com toast para sucesso
+        Fluttertoast.showToast(
+          msg: "Account created successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+
         // Redireciona para a página de login
         Navigator.pushReplacement(
           context,
