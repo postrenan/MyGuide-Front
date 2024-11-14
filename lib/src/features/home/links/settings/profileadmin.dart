@@ -29,7 +29,7 @@ class _AdminPageState extends State<AdminPage> {
       if (files!.isEmpty) return;
 
       final reader = html.FileReader();
-      reader.readAsDataUrl(files[0]!);
+      reader.readAsDataUrl(files[0]);
       
       reader.onLoadEnd.listen((e) {
         setState(() {

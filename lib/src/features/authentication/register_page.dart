@@ -5,8 +5,7 @@ import 'package:myguide_app/src/features/authentication/register_shop.dart';
 import 'package:myguide_app/src/features/authentication/login_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:intl/intl.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Importação do pacote fluttertoast
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -27,7 +26,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _repeatPasswordController = TextEditingController();
 
   Future<void> _createCredentials() async {
-    // Verificação de campos obrigatórios
     if (_emailController.text.isEmpty ||
         _nameController.text.isEmpty ||
         _usernameController.text.isEmpty ||
@@ -38,7 +36,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Verificação se as senhas coincidem
     if (_passwordController.text != _repeatPasswordController.text) {
       _showMessage('Passwords do not match');
       return;
@@ -56,13 +53,12 @@ class _RegisterPageState extends State<RegisterPage> {
           'email': _emailController.text,
           'name': _nameController.text,
           'username': _usernameController.text,
-          'birthday':"1990-01-01T00:00:00.000Z", 
+          'birthday': _birthdayController.text, 
           'password': _passwordController.text,
         }),
       );
 
       if (response.statusCode == 200) {
-        // Notificação com toast para sucesso
         Fluttertoast.showToast(
           msg: "Account created successfully",
           toastLength: Toast.LENGTH_SHORT,
@@ -72,7 +68,6 @@ class _RegisterPageState extends State<RegisterPage> {
           fontSize: 16.0,
         );
 
-        // Redireciona para a página de login
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
@@ -102,7 +97,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
     if (picked != null && picked != DateTime.now()) {
       setState(() {
-        _birthdayController.text = DateFormat('yyyy-MM-dd').format(picked);
+        // Formato da data alterado para `1990-01-01T00:00:00.000Z`
+        _birthdayController.text = picked.toUtc().toIso8601String();
       });
     }
   }
