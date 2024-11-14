@@ -47,7 +47,7 @@ class MyCarousel extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => Review(
                         itemName: itemNames[index],
-                        imageUrl: imageUrl,  // Passando a URL para o Review
+                        imageUrl: imageUrl, 
                       ),
                     ),
                   );

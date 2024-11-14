@@ -49,14 +49,14 @@ class _AdminPageState extends State<AdminPage> {
         _openTimeController.text.isNotEmpty &&
         _closeTimeController.text.isNotEmpty &&
         _imageBase64 != null) {
-      // Exibe o snackbar de confirmação
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Shop added'),
         ),
       );
     } else {
-      // Caso algum campo esteja vazio, podemos exibir um alerta ou mensagem de erro
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill all fields and upload an image'),
