@@ -58,7 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         // Mostra o Toast de sucesso
         Fluttertoast.showToast(
           msg: "Account created successfully",
