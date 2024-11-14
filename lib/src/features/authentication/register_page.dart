@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:myguide_app/src/constants/colors.dart';
-import 'package:myguide_app/src/features/authentication/screens/register_shop.dart';
-import 'package:myguide_app/src/features/authentication/screens/login_page.dart'; // Adicione a importação da página de login
+import 'package:myguide_app/src/features/authentication/register_shop.dart';
+import 'package:myguide_app/src/features/authentication/login_page.dart'; // Adicione a importação da página de login
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -54,7 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
           'email': _emailController.text,
           'name': _nameController.text,
           'username': _usernameController.text,
-          'birthday': _birthdayController.text,
+          'birthday': _birthdayController.text, // Data formatada
           'password': _passwordController.text,
         }),
       );
@@ -80,6 +81,20 @@ class _RegisterPageState extends State<RegisterPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _birthdayController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
   }
 
   @override
@@ -135,7 +150,12 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 20),
               _buildTextField("Username", 350, _usernameController),
               const SizedBox(height: 20),
-              _buildTextField("Birthday", 350, _birthdayController),
+              InkWell(
+                onTap: () => _selectDate(context),
+                child: AbsorbPointer(
+                  child: _buildTextField("Birthday", 350, _birthdayController),
+                ),
+              ),
               const SizedBox(height: 20),
               _buildPasswordField("Password", 350, _isPasswordVisible, () {
                 setState(() {

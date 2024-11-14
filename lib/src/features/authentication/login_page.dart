@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
-import 'package:myguide_app/src/features/authentication/screens/register_page.dart';
-import 'package:myguide_app/src/features/home/screens/homepage.dart';
+import 'package:myguide_app/src/features/authentication/register_page.dart';
+import 'package:myguide_app/src/features/home/page/homepage.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 

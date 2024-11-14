@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
-import 'package:myguide_app/src/features/home/screens/carousel.dart';
+import 'package:myguide_app/src/features/home/page/carousel.dart';
+import 'package:myguide_app/src/features/home/links/settings/profilepage.dart';
+import 'package:myguide_app/src/features/home/links/settings/profileadmin.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _locationEnabled = false;
+  bool notadmin = false; 
 
   void _toggleLocation() {
     setState(() {
@@ -29,7 +32,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             TextButton(
               onPressed: () {},
-              child: Text(
+              child: const Text(
                 'Favorites',
                 style: TextStyle(color: Colors.black),
               ),
@@ -37,16 +40,16 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(width: 250.0),
             TextButton(
               onPressed: () {},
-              child: Text(
-                'Rated',
+              child: const Text(
+                'Reviews',
                 style: TextStyle(color: Colors.black),
               ),
             ),
             const SizedBox(width: 250.0),
             TextButton(
               onPressed: () {},
-              child: Text(                              //listar melhor avaliados
-                'Shops',
+              child: const Text(
+                'Best Shops',
                 style: TextStyle(color: Colors.black),
               ),
             ),
@@ -75,7 +78,23 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.only(right: 50.0),
                     child: IconButton(
                       icon: Icon(Icons.person, color: primaryColor, size: 40),
-                      onPressed: () {},
+                      onPressed: () {
+                        if (notadmin) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfilePage(),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdminPage(), 
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -99,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
                   ),
                 ),
               ),
@@ -112,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 label: Text(
                   _locationEnabled ? 'Disable location' : 'Use your location',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
@@ -123,16 +142,25 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 20.0),
               if (_locationEnabled) ...[
-                MyCarousel(),
+                MyCarousel(
+                  title: 'category 1',
+                  itemNames: ['shop 1', 'shop 2', 'shop 3', 'shop 4', 'shop 5', 'shop 6', 'shop 7', 'shop 8'],
+                ),
                 const SizedBox(height: 15.0),
-                MyCarousel(),
+                MyCarousel(
+                  title: 'category 2',
+                  itemNames: ['shop 1', 'shop 2', 'shop 3', 'shop 4', 'shop 5', 'shop 6', 'shop 7', 'shop 8'],
+                ),
                 const SizedBox(height: 15.0),
-                MyCarousel(),
+                MyCarousel(
+                  title: 'category 3',
+                  itemNames: ['shop 1', 'shop 2', 'shop 3', 'shop 4', 'shop 5', 'shop 6', 'shop 7', 'shop 8'],
+                ),
                 const SizedBox(height: 15.0),
               ] else ...[
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text(
+                  child: const Text(
                     'Location blocked',
                     style: TextStyle(color: Colors.grey, fontSize: 16),
                     textAlign: TextAlign.center,
