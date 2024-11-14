@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: const EdgeInsets.only(right: 50.0),
                     child: IconButton(
-                      icon: Icon(Icons.person, color: primaryColor, size: 40),
+                      icon: const Icon(Icons.person, color: primaryColor, size: 40),
                       onPressed: () {
                         if (notadmin) {
                           Navigator.push(
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AdminPage(), 
+                              builder: (context) => const AdminPage(), 
                             ),
                           );
                         }
@@ -142,25 +142,25 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 20.0),
               if (_locationEnabled) ...[
-                MyCarousel(
+                const MyCarousel(
                   title: 'category 1',
                   itemNames: ['shop 1', 'shop 2', 'shop 3', 'shop 4', 'shop 5', 'shop 6', 'shop 7', 'shop 8'],
                 ),
                 const SizedBox(height: 15.0),
-                MyCarousel(
+                const MyCarousel(
                   title: 'category 2',
                   itemNames: ['shop 1', 'shop 2', 'shop 3', 'shop 4', 'shop 5', 'shop 6', 'shop 7', 'shop 8'],
                 ),
                 const SizedBox(height: 15.0),
-                MyCarousel(
+                const MyCarousel(
                   title: 'category 3',
                   itemNames: ['shop 1', 'shop 2', 'shop 3', 'shop 4', 'shop 5', 'shop 6', 'shop 7', 'shop 8'],
                 ),
                 const SizedBox(height: 15.0),
               ] else ...[
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: const Text(
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
                     'Location blocked',
                     style: TextStyle(color: Colors.grey, fontSize: 16),
                     textAlign: TextAlign.center,

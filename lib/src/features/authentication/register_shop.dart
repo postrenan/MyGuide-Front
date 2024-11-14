@@ -53,7 +53,7 @@ class _RegisterShopState extends State<RegisterShop> {
         },
         body: jsonEncode(<String, String>{
           'email': _emailController.text,
-          'shopName': _shopNameController.text,
+          'name': _shopNameController.text,
           'country': _countryController.text,
           'city': _cityController.text,
           'address': _addressController.text,

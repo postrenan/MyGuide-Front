@@ -9,8 +9,8 @@ class Review extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _titleController = TextEditingController();
-    TextEditingController _controller = TextEditingController();
+    TextEditingController titleController = TextEditingController();
+    TextEditingController controller = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -39,10 +39,10 @@ class Review extends StatelessWidget {
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.topCenter,
-              child: Container(
+              child: SizedBox(
                 width: 300,
                 child: TextField(
-                  controller: _titleController,
+                  controller: titleController,
                   decoration: InputDecoration(
                     hintText: 'Enter title',
                     filled: true,
@@ -58,10 +58,10 @@ class Review extends StatelessWidget {
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.topCenter,
-              child: Container(
+              child: SizedBox(
                 width: 300,
                 child: TextField(
-                  controller: _controller,
+                  controller: controller,
                   maxLines: 4,
                   decoration: InputDecoration(
                     hintText: 'Write your review here...',
@@ -78,21 +78,21 @@ class Review extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                String reviewText = _controller.text;
-                String titleText = _titleController.text;
+                String reviewText = controller.text;
+                String titleText = titleController.text;
                 if (reviewText.isNotEmpty && titleText.isNotEmpty) {
                   print('Review title: $titleText');
                   print('Review submitted: $reviewText');
-                  _controller.clear();
-                  _titleController.clear();
+                  controller.clear();
+                  titleController.clear();
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: secundaryColor,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                textStyle: TextStyle(fontSize: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                textStyle: const TextStyle(fontSize: 16),
               ),
-              child: Text(
+              child: const Text(
                 'Send Review',
                 style: TextStyle(color: Colors.white),
               ),

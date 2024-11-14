@@ -176,7 +176,7 @@ class LoginPage extends StatelessWidget {
                     if (loginSuccessful) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => const HomePage()),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(

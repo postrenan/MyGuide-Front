@@ -4,7 +4,7 @@ import 'custom_text_field.dart';
 import 'dart:html' as html;
 
 class AdminPage extends StatefulWidget {
-  const AdminPage({Key? key}) : super(key: key);
+  const AdminPage({super.key});
 
   @override
   _AdminPageState createState() => _AdminPageState();

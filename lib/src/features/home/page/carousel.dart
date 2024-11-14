@@ -24,7 +24,7 @@ class MyCarousel extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: primaryColor,
@@ -53,7 +53,7 @@ class MyCarousel extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: 200,
                   child: Stack(
                     children: [
