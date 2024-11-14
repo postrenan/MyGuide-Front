@@ -3,12 +3,38 @@ import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/register_page.dart';
 import 'package:myguide_app/src/features/home/page/homepage.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LoginPage extends StatelessWidget {
   final ValueNotifier<bool> _rememberMe = ValueNotifier<bool>(true);
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   LoginPage({super.key});
+
+  Future<bool> _loginUser() async {
+    String apiKey = dotenv.env['API_URL'] ?? 'default_api_url';
+
+    final response = await http.post(
+      Uri.parse('${apiKey}users/login'), // Endpoint de login
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['exists'] == true; // verifica se o usuário existe e foi autenticado
+    } else {
+      return false; // login falhou
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +48,7 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                 Text(
+                Text(
                   "Find your next souvenir",
                   style: GoogleFonts.italianno(
                     fontSize: 45,
@@ -85,6 +111,7 @@ class LoginPage extends StatelessWidget {
                 SizedBox(
                   width: 300,
                   child: TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
                       filled: true,
@@ -100,6 +127,7 @@ class LoginPage extends StatelessWidget {
                 SizedBox(
                   width: 300,
                   child: TextField(
+                    controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'Password',
@@ -142,18 +170,18 @@ class LoginPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 130, vertical: 20),
                   ),
-                  onPressed: () {
-                    bool loginSuccessful = true; //login -------------------
+                  onPressed: () async {
+                    bool loginSuccessful = await _loginUser();
 
                     if (loginSuccessful) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => HomePage()),
                       );
-                    }else{
-                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Login failed. Please try again.')),
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Login failed. Please try again.')),
                       );
                     }
                   },
