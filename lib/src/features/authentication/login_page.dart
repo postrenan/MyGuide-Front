@@ -17,20 +17,17 @@ class LoginPage extends StatelessWidget {
   Future<bool> _loginUser() async {
     String apiKey = dotenv.env['API_URL'] ?? 'default_api_url';
 
-    final response = await http.post(
-      Uri.parse('${apiKey}users/login'), // Endpoint de login
+    final response = await http.get(
+      Uri.parse('${apiKey}users/${_emailController.text}'), 
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, String>{
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      }),
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data['exists'] == true; // verifica se o usuário existe e foi autenticado
+      // Verifica se a senha do input é igual à senha do banco
+      return data['password'] == _passwordController.text;
     } else {
       return false; // login falhou
     }
@@ -68,7 +65,7 @@ class LoginPage extends StatelessWidget {
                 const SizedBox(height: 30),
                 TextButton(
                   style: TextButton.styleFrom(
-                    backgroundColor: secundaryColor,
+                    backgroundColor: const Color.fromRGBO(255, 152, 0, 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

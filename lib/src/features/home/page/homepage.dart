@@ -3,6 +3,10 @@ import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/home/page/carousel.dart';
 import 'package:myguide_app/src/features/home/links/settings/profilepage.dart';
 import 'package:myguide_app/src/features/home/links/settings/profileadmin.dart';
+import 'package:myguide_app/src/features/home/links/favorites.dart';
+import 'package:myguide_app/src/features/home/links/reviews.dart';
+import 'package:myguide_app/src/features/home/links/bestshops.dart';
+import 'package:myguide_app/src/features/authentication/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,48 +20,138 @@ class _HomePageState extends State<HomePage> {
   bool _locationEnabled = false;
   bool notadmin = false; 
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _birthdayController = TextEditingController();
+
   void _toggleLocation() {
     setState(() {
       _locationEnabled = !_locationEnabled;
     });
   }
 
+  void _showProfileModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Profile Management'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: _cityController,
+                decoration: const InputDecoration(labelText: 'City'),
+              ),
+              TextField(
+                controller: _birthdayController,
+                decoration: const InputDecoration(labelText: 'Birthday'),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _birthdayController.text = "${pickedDate.toLocal()}".split(' ')[0];
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                // Adicione a lógica para salvar as alterações aqui
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logout(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: thirdColor,
+        backgroundColor: const Color(0xFF273F57), // Azul
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FavoritesPage()),
+                );
+              },
               child: const Text(
                 'Favorites',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
             ),
             const SizedBox(width: 250.0),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ReviewsPage()),
+                );
+              },
               child: const Text(
                 'Reviews',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
             ),
             const SizedBox(width: 250.0),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BestShopsPage()),
+                );
+              },
               child: const Text(
                 'Best Shops',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app, color: Colors.white),
+            onPressed: () {
+              _logout(context);
+            },
+          ),
+        ],
       ),
-      backgroundColor: thirdColor,
+      backgroundColor: const Color(0xFFE0E0E0), // Cinza claro
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -77,23 +171,9 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: const EdgeInsets.only(right: 50.0),
                     child: IconButton(
-                      icon: const Icon(Icons.person, color: primaryColor, size: 40),
+                      icon: const Icon(Icons.person, color: Color(0xFFFF9800), size: 40), // Laranja
                       onPressed: () {
-                        if (notadmin) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfilePage(),
-                            ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminPage(), 
-                            ),
-                          );
-                        }
+                        _showProfileModal(context);
                       },
                     ),
                   ),
@@ -103,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                 'Where are you going?',
                 style: GoogleFonts.italianno(
                   fontSize: 72,
-                  color: primaryColor,
+                  color: const Color(0xFF273F57), // Azul
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -118,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF273F57)), // Azul
                   ),
                 ),
               ),
@@ -134,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: const Color(0xFFFF9800), // Laranja
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),

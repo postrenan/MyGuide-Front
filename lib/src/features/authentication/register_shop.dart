@@ -15,12 +15,15 @@ class RegisterShop extends StatefulWidget {
 class _RegisterShopState extends State<RegisterShop> {
   bool _isPasswordVisible = false;
   bool _isRepeatPasswordVisible = false;
+  int _currentStep = 0;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _shopNameController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController = TextEditingController();
 
@@ -31,6 +34,8 @@ class _RegisterShopState extends State<RegisterShop> {
         _countryController.text.isEmpty ||
         _cityController.text.isEmpty ||
         _addressController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        _priceController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _repeatPasswordController.text.isEmpty) {
       _showMessage('Please fill all fields');
@@ -57,6 +62,8 @@ class _RegisterShopState extends State<RegisterShop> {
           'country': _countryController.text,
           'city': _cityController.text,
           'address': _addressController.text,
+          'description': _descriptionController.text,
+          'price': _priceController.text,
           'password': _passwordController.text,
         }),
       );
@@ -97,6 +104,8 @@ class _RegisterShopState extends State<RegisterShop> {
     _countryController.dispose();
     _cityController.dispose();
     _addressController.dispose();
+    _descriptionController.dispose();
+    _priceController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
     super.dispose();
@@ -109,7 +118,7 @@ class _RegisterShopState extends State<RegisterShop> {
         leading: const BackButton(),
       ),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -123,49 +132,89 @@ class _RegisterShopState extends State<RegisterShop> {
                 ),
               ),
               const SizedBox(height: 40),
-              _buildTextField("Email", 350, _emailController),
-              const SizedBox(height: 20),
-              _buildTextField("Shop Name", 350, _shopNameController),
-              const SizedBox(height: 20),
-              _buildTextField("Country", 350, _countryController),
-              const SizedBox(height: 20),
-              _buildTextField("City", 350, _cityController),
-              const SizedBox(height: 20),
-              _buildTextField("Address", 350, _addressController),
-              const SizedBox(height: 20),
-              _buildPasswordField("Password", 350, _isPasswordVisible, () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              }, _passwordController),
-              const SizedBox(height: 20),
-              _buildPasswordField("Repeat Password", 350, _isRepeatPasswordVisible, () {
-                setState(() {
-                  _isRepeatPasswordVisible = !_isRepeatPasswordVisible;
-                });
-              }, _repeatPasswordController),
+              _currentStep == 0 ? _buildStep1() : _buildStep2(),
               const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: _createShopAccount,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secundaryColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  "Create account",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
+              _currentStep == 0
+                  ? ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentStep = 1;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: secundaryColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        "Next",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    )
+                  : ElevatedButton(
+                      onPressed: _createShopAccount,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: secundaryColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        "Concluir",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildStep1() {
+    return Column(
+      children: [
+        _buildTextField("Email", 350, _emailController),
+        const SizedBox(height: 20),
+        _buildTextField("Shop Name", 350, _shopNameController),
+        const SizedBox(height: 20),
+        _buildTextField("Country", 350, _countryController),
+        const SizedBox(height: 20),
+        _buildTextField("City", 350, _cityController),
+      ],
+    );
+  }
+
+  Widget _buildStep2() {
+    return Column(
+      children: [
+        _buildTextField("Address", 350, _addressController),
+        const SizedBox(height: 20),
+        _buildTextField("Description", 350, _descriptionController),
+        const SizedBox(height: 20),
+        _buildTextField("Price", 350, _priceController),
+        const SizedBox(height: 20),
+        _buildPasswordField("Password", 350, _isPasswordVisible, () {
+          setState(() {
+            _isPasswordVisible = !_isPasswordVisible;
+          });
+        }, _passwordController),
+        const SizedBox(height: 20),
+        _buildPasswordField("Repeat Password", 350, _isRepeatPasswordVisible, () {
+          setState(() {
+            _isRepeatPasswordVisible = !_isRepeatPasswordVisible;
+          });
+        }, _repeatPasswordController),
+      ],
     );
   }
 
