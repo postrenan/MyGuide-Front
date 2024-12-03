@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myguide_app/src/constants/colors.dart';
 
 class ReviewsPage extends StatelessWidget {
   const ReviewsPage({super.key});
@@ -7,9 +8,13 @@ class ReviewsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reviews de Atrativos Turísticos'),
-        backgroundColor: const Color(0xFF273F57), // Azul
+        title: const Text('Reviews de Atrativos Turísticos',style: TextStyle(color:Colors.white,),),
+        backgroundColor: const Color(0xFF273F57),
+        iconTheme: const IconThemeData(
+          color:Colors.white,
+        ), // Azul
       ),
+      backgroundColor: thirdColor,
       body: ListView(
         children: [
           _buildReviewCard(

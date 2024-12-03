@@ -19,6 +19,7 @@ dependencies:
   file_picker: ^5.0.1
   intl: ^0.18.0
   fluttertoast: ^8.2.8
+  flutter_rating_bar: ^4.0.0
 
 dev_dependencies:
   flutter_test:
