@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -24,6 +24,17 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _nameController.dispose();
+    _usernameController.dispose();
+    _birthdayController.dispose();
+    _passwordController.dispose();
+    _repeatPasswordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _createCredentials() async {
     if (_emailController.text.isEmpty ||
@@ -42,14 +53,11 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
-
+      final apiUrl = dotenv.env['API_URL'] ?? 'default_api_key';
       final response = await http.post(
-        Uri.parse('${apiKey}users'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
+        Uri.parse('$apiUrl/users'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({
           'email': _emailController.text,
           'name': _nameController.text,
           'username': _usernameController.text,
@@ -59,7 +67,6 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        // Mostra o Toast de sucesso
         Fluttertoast.showToast(
           msg: "Account created successfully",
           toastLength: Toast.LENGTH_SHORT,
@@ -69,22 +76,13 @@ class _RegisterPageState extends State<RegisterPage> {
           fontSize: 16.0,
         );
 
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } else if (response.statusCode == 400) {
         _showMessage('Invalid data. Please check your inputs.');
-      } else if (response.statusCode == 500) {
-        // Mostra o Toast de erro
-        Fluttertoast.showToast(
-          msg: "Server error. Please try again later.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
       } else {
         _showMessage('Error: ${response.statusCode}');
       }
@@ -94,9 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -106,22 +102,11 @@ class _RegisterPageState extends State<RegisterPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != DateTime.now()) {
+    if (picked != null) {
       setState(() {
-        _birthdayController.text = picked.toUtc().toIso8601String();
+        _birthdayController.text = picked.toIso8601String();
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _nameController.dispose();
-    _usernameController.dispose();
-    _birthdayController.dispose();
-    _passwordController.dispose();
-    _repeatPasswordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -131,7 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
         leading: const BackButton(),
       ),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -160,26 +145,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 40),
-              _buildTextField("Email", 350, _emailController),
+              _buildTextField("Email", _emailController),
               const SizedBox(height: 20),
-              _buildTextField("Full Name", 350, _nameController),
+              _buildTextField("Full Name", _nameController),
               const SizedBox(height: 20),
-              _buildTextField("Username", 350, _usernameController),
+              _buildTextField("Username", _usernameController),
               const SizedBox(height: 20),
               InkWell(
                 onTap: () => _selectDate(context),
                 child: AbsorbPointer(
-                  child: _buildTextField("Birthday", 350, _birthdayController),
+                  child: _buildTextField("Birthday", _birthdayController),
                 ),
               ),
               const SizedBox(height: 20),
-              _buildPasswordField("Password", 350, _isPasswordVisible, () {
+              _buildPasswordField("Password", _isPasswordVisible, () {
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
                 });
               }, _passwordController),
               const SizedBox(height: 20),
-              _buildPasswordField("Repeat Password", 350, _isRepeatPasswordVisible, () {
+              _buildPasswordField("Repeat Password", _isRepeatPasswordVisible, () {
                 setState(() {
                   _isRepeatPasswordVisible = !_isRepeatPasswordVisible;
                 });
@@ -209,47 +194,48 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildTextField(String hintText, double width, TextEditingController controller) {
+  Widget _buildTextField(String hintText, TextEditingController controller) {
     return SizedBox(
-      width: width,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      width: 350,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[400],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPasswordField(String hintText, double width, bool isPasswordVisible, VoidCallback toggleVisibility, TextEditingController controller) {
+  Widget _buildPasswordField(
+    String hintText,
+    bool isPasswordVisible,
+    VoidCallback toggleVisibility,
+    TextEditingController controller,
+  ) {
     return SizedBox(
-      width: width,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: TextField(
-          controller: controller,
-          obscureText: !isPasswordVisible,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            suffixIcon: IconButton(
-              icon: Icon(
-                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              ),
-              onPressed: toggleVisibility,
+      width: 350,
+      child: TextField(
+        controller: controller,
+        obscureText: !isPasswordVisible,
+        decoration: InputDecoration(
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[400],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              isPasswordVisible ? Icons.visibility : Icons.visibility_off,
             ),
+            onPressed: toggleVisibility,
           ),
         ),
       ),

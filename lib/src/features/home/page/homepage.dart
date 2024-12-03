@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/home/page/carousel.dart';
-import 'package:myguide_app/src/features/home/links/settings/profilepage.dart';
-import 'package:myguide_app/src/features/home/links/settings/profileadmin.dart';
 import 'package:myguide_app/src/features/home/links/favorites.dart';
 import 'package:myguide_app/src/features/home/links/reviews.dart';
 import 'package:myguide_app/src/features/home/links/bestshops.dart';
