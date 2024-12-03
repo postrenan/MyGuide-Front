@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myguide_app/src/constants/colors.dart';
 
 class BestShopsPage extends StatelessWidget {
   const BestShopsPage({super.key});
@@ -7,9 +8,13 @@ class BestShopsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Best Shops'),
-        backgroundColor: const Color(0xFF273F57), // Azul
+        title: const Text('Best Shops', style: TextStyle(color:Colors.white,),),
+        backgroundColor: const Color(0xFF273F57),
+        iconTheme: const IconThemeData(
+          color:Colors.white,
+        ),  // Azul
       ),
+      backgroundColor: thirdColor,
       body: ListView(
         children: [
           _buildShopCard(
