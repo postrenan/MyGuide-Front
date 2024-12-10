@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -53,9 +53,9 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      final apiUrl = dotenv.env['API_URL'] ?? 'default_api_key';
+      final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
       final response = await http.post(
-        Uri.parse('$apiUrl/users'),
+        Uri.parse('${apiUrl}users'),
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: jsonEncode({
           'email': _emailController.text,
@@ -79,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
+          MaterialPageRoute(builder: (context) =>  const LoginPage()),
         );
       } else if (response.statusCode == 400) {
         _showMessage('Invalid data. Please check your inputs.');

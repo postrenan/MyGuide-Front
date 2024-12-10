@@ -5,6 +5,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:myguide_app/src/features/authentication/login_page.dart';
+
 class RegisterShop extends StatefulWidget {
   const RegisterShop({super.key});
 
@@ -21,75 +23,122 @@ class _RegisterShopState extends State<RegisterShop> {
   final TextEditingController _shopNameController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _streetController = TextEditingController();
+  final TextEditingController _numberController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _productsController = TextEditingController();
+  final TextEditingController _openTimeController = TextEditingController();
+  final TextEditingController _closeTimeController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
 
-  Future<void> _createShopAccount() async {
-    // Validação dos campos obrigatórios
-    if (_emailController.text.isEmpty ||
-        _shopNameController.text.isEmpty ||
-        _countryController.text.isEmpty ||
-        _cityController.text.isEmpty ||
-        _addressController.text.isEmpty ||
-        _descriptionController.text.isEmpty ||
-        _priceController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _repeatPasswordController.text.isEmpty) {
-      _showMessage('Please fill all fields');
-      return;
-    }
+  List<dynamic> _categories = [];
+  String? _selectedCategoryName;
+  int? _selectedCategoryId; // Alterado para armazenar o ID da categoria
+  String _selectedPrice = 'low'; // Valor padrão
+  String _selectedProducts = '10'; // Valor padrão
 
-    // Verificação se as senhas coincidem
-    if (_passwordController.text != _repeatPasswordController.text) {
-      _showMessage('Passwords do not match');
-      return;
-    }
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
 
+  Future<void> _fetchCategories() async {
     try {
       String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
-
-      final response = await http.post(
-        Uri.parse('${apiKey}shops'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'email': _emailController.text,
-          'name': _shopNameController.text,
-          'country': _countryController.text,
-          'city': _cityController.text,
-          'address': _addressController.text,
-          'description': _descriptionController.text,
-          'price': _priceController.text,
-          'password': _passwordController.text,
-        }),
-      );
+      final response = await http.get(Uri.parse('${apiKey}categories'));
 
       if (response.statusCode == 200) {
-        // Exibir mensagem de sucesso
-        Fluttertoast.showToast(
-          msg: "Shop account created successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-
-        // Redireciona para a página de login ou outro fluxo
-        Navigator.pop(context);
-      } else if (response.statusCode == 400) {
-        _showMessage('Invalid data. Please check your inputs.');
+        final List<dynamic> categories = jsonDecode(response.body);
+        setState(() {
+          _categories = categories;
+        });
       } else {
-        _showMessage('Error: ${response.statusCode}');
+        _showMessage('Failed to load categories');
       }
     } catch (e) {
-      _showMessage('An error occurred. Please try again.');
+      _showMessage('An error occurred while loading categories');
     }
   }
+
+  Future<void> _createShopAccount() async {
+  if (_emailController.text.isEmpty ||
+      _shopNameController.text.isEmpty ||
+      _countryController.text.isEmpty ||
+      _cityController.text.isEmpty ||
+      _streetController.text.isEmpty ||
+      _numberController.text.isEmpty ||
+      _descriptionController.text.isEmpty ||
+      _openTimeController.text.isEmpty ||
+      _closeTimeController.text.isEmpty ||
+      _passwordController.text.isEmpty ||
+      _repeatPasswordController.text.isEmpty ||
+      _selectedCategoryId == null || // Verifique se o id da categoria foi selecionado
+      _stateController.text.isEmpty) {
+    _showMessage('Please fill all fields and select a category');
+    return;
+  }
+
+  if (_passwordController.text != _repeatPasswordController.text) {
+    _showMessage('Passwords do not match');
+    return;
+  }
+
+  try {
+    String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
+
+    final response = await http.post(
+      Uri.parse('${apiKey}shops'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'email': _emailController.text,
+        'name': _shopNameController.text,
+        'country': _countryController.text,
+        'city': _cityController.text,
+        'street': _streetController.text,
+        'number': int.tryParse(_numberController.text) ?? 0,
+        'description': _descriptionController.text,
+        'price': _selectedPrice,
+        'categoryId': _selectedCategoryId, // Envia o id da categoria
+        'products': int.tryParse(_productsController.text) ?? 0,
+        'openTime': _openTimeController.text,
+        'closeTime': _closeTimeController.text,
+        'password': _passwordController.text,
+        'state': _stateController.text,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      // Exibe a notificação de sucesso no canto inferior direito
+      Fluttertoast.showToast(
+        msg: "Shop account created successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      // Redireciona para a página de login
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) =>  const LoginPage()),
+        );  // Certifique-se de ter configurado a rota '/login' no seu app
+    } else if (response.statusCode == 400) {
+      _showMessage('Invalid data. Please check your inputs.');
+    } else {
+      _showMessage('Error: ${response.statusCode}');
+    }
+  } catch (e) {
+    _showMessage('An error occurred. Please try again.');
+  }
+}
+
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -103,11 +152,16 @@ class _RegisterShopState extends State<RegisterShop> {
     _shopNameController.dispose();
     _countryController.dispose();
     _cityController.dispose();
-    _addressController.dispose();
+    _streetController.dispose();
+    _numberController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _productsController.dispose();
+    _openTimeController.dispose();
+    _closeTimeController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
+    _stateController.dispose();
     super.dispose();
   }
 
@@ -115,7 +169,12 @@ class _RegisterShopState extends State<RegisterShop> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -132,51 +191,60 @@ class _RegisterShopState extends State<RegisterShop> {
                 ),
               ),
               const SizedBox(height: 40),
-              _currentStep == 0 ? _buildStep1() : _buildStep2(),
-              const SizedBox(height: 40),
-              _currentStep == 0
-                  ? ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _currentStep = 1;
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: secundaryColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        "Next",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
-                  : ElevatedButton(
-                      onPressed: _createShopAccount,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: secundaryColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        "Concluir",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
+              if (_currentStep == 0) _buildStepWithButtons(_buildStep1()),
+              if (_currentStep == 1) _buildStepWithButtons(_buildStep2()),
+              if (_currentStep == 2) _buildStepWithButtons(_buildStep3()),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildStepWithButtons(Widget stepContent) {
+    return Column(
+      children: [
+        stepContent,
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            if (_currentStep > 0)
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _currentStep--;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text("Back"),
+              ),
+            ElevatedButton(
+              onPressed: _currentStep == 2
+                  ? _createShopAccount
+                  : () {
+                      setState(() {
+                        _currentStep++;
+                      });
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(_currentStep == 2 ? "Conclude" : "Next"),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -190,6 +258,8 @@ class _RegisterShopState extends State<RegisterShop> {
         _buildTextField("Country", 350, _countryController),
         const SizedBox(height: 20),
         _buildTextField("City", 350, _cityController),
+        const SizedBox(height: 20),
+        _buildTextField("State", 350, _stateController),
       ],
     );
   }
@@ -197,71 +267,146 @@ class _RegisterShopState extends State<RegisterShop> {
   Widget _buildStep2() {
     return Column(
       children: [
-        _buildTextField("Address", 350, _addressController),
+        _buildTextField("Street", 350, _streetController),
+        const SizedBox(height: 20),
+        _buildTextField("Number", 350, _numberController, inputType: TextInputType.number),
         const SizedBox(height: 20),
         _buildTextField("Description", 350, _descriptionController),
         const SizedBox(height: 20),
-        _buildTextField("Price", 350, _priceController),
+        _buildDropdownField(
+          label: "Price",
+          value: _selectedPrice,
+          items: ["low", "moderate", "high"],
+          onChanged: (value) {
+            setState(() {
+              _selectedPrice = value!;
+            });
+          },
+        ),
         const SizedBox(height: 20),
-        _buildPasswordField("Password", 350, _isPasswordVisible, () {
-          setState(() {
-            _isPasswordVisible = !_isPasswordVisible;
-          });
-        }, _passwordController),
+        _buildDropdownField(
+          label: "Products",
+          value: _selectedProducts,
+          items: ["10", "20", "30", "50", "100+"],
+          onChanged: (value) {
+            setState(() {
+              _selectedProducts = value!;
+            });
+          },
+        ),
         const SizedBox(height: 20),
-        _buildPasswordField("Repeat Password", 350, _isRepeatPasswordVisible, () {
-          setState(() {
-            _isRepeatPasswordVisible = !_isRepeatPasswordVisible;
-          });
-        }, _repeatPasswordController),
+        _buildDropdownField(
+          label: "Category",
+          value: _selectedCategoryName ?? _categories[0]['name'], // Valor padrão
+          items: _categories.map((category) => category['name'].toString()).toList(),
+          onChanged: (value) {
+            setState(() {
+              // A categoria selecionada agora armazena o id
+              _selectedCategoryId = _categories.firstWhere((category) => category['name'] == value)['id'];
+              _selectedCategoryName = value; // Exibe o nome da categoria
+            });
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildTextField(String hintText, double width, TextEditingController controller) {
-    return SizedBox(
-      width: width,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          ),
-        ),
-      ),
+  Widget _buildStep3() {
+    return Column(
+      children: [
+        _buildTextField("Open Time", 350, _openTimeController),
+        const SizedBox(height: 20),
+        _buildTextField("Close Time", 350, _closeTimeController),
+        const SizedBox(height: 20),
+        _buildTextField("Password", 350, _passwordController, isPassword: true),
+        const SizedBox(height: 20),
+        _buildTextField("Repeat Password", 350, _repeatPasswordController, isPassword: true),
+      ],
     );
   }
 
-  Widget _buildPasswordField(String hintText, double width, bool isPasswordVisible, VoidCallback toggleVisibility, TextEditingController controller) {
-    return SizedBox(
-      width: width,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(30),
+ Widget _buildTextField(
+  String label,
+  double width,
+  TextEditingController controller, {
+  bool isPassword = false,
+  TextInputType inputType = TextInputType.text,
+}) {
+  return SizedBox(
+    width: width,
+    child: TextField(
+      controller: controller,
+      keyboardType: inputType,
+      obscureText: isPassword && !_isPasswordVisible,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.black), // Cor do texto do label
+        filled: true, // Adiciona cor de fundo
+        fillColor: Colors.white, // Cor de fundo do campo
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30), // Bordas arredondadas
+          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
         ),
-        child: TextField(
-          controller: controller,
-          obscureText: !isPasswordVisible,
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            suffixIcon: IconButton(
-              icon: Icon(
-                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-              ),
-              onPressed: toggleVisibility,
-            ),
-          ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
+        ),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+              )
+            : null,
+      ),
+    ),
+  );
+}
+
+Widget _buildDropdownField({
+  required String label,
+  required String value,
+  required List<String> items,
+  required ValueChanged<String?> onChanged,
+}) {
+  return SizedBox(
+    width: 350, // Adicionando a mesma largura dos outros inputs
+    child: DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.black), // Cor do texto do label
+        filled: true, // Adiciona cor de fundo
+        fillColor: Colors.white, // Cor de fundo do campo
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30), // Bordas arredondadas
+          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
         ),
       ),
-    );
-  }
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+    ),
+  );
+}
+
 }

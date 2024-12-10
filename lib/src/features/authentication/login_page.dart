@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/register_page.dart';
 import 'package:myguide_app/src/features/home/page/homepage.dart';
+import 'package:myguide_app/src/features/shop/shop_login_page.dart'; // Importando a página de login da shop
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../guest/guest_home_page.dart';
+
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final ValueNotifier<bool> _rememberMe = ValueNotifier<bool>(true);
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -23,23 +25,23 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _rememberMe.dispose();
     super.dispose();
   }
 
   Future<bool> _loginUser() async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
     final response = await http.get(
-      Uri.parse('$apiUrl/users/${_emailController.text}'),
+      Uri.parse('${apiUrl}users/${_emailController.text}'),
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+
+      // Verifica se a senha está correta
       return data['password'] == _passwordController.text;
-    } else {
-      return false;
     }
+    return false;
   }
 
   void _navigateToRegister() {
@@ -63,6 +65,22 @@ class _LoginPageState extends State<LoginPage> {
         const SnackBar(content: Text('Login failed. Please try again.')),
       );
     }
+  }
+
+  // Função para redirecionar para a página de convidado
+  void _loginAsGuest() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const GuestHomePage()), // Redireciona para a página de convidado
+    );
+  }
+
+  // Função para redirecionar para a página de login da shop
+  void _loginAsShop() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const ShopLoginPage()), // Redireciona para a página de login da shop
+    );
   }
 
   @override
@@ -131,25 +149,6 @@ class _LoginPageState extends State<LoginPage> {
                   _buildTextField("Email", _emailController, false),
                   const SizedBox(height: 20),
                   _buildTextField("Password", _passwordController, true),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ValueListenableBuilder<bool>(
-                        valueListenable: _rememberMe,
-                        builder: (context, value, child) {
-                          return Checkbox(
-                            value: value,
-                            activeColor: Colors.black,
-                            onChanged: (newValue) {
-                              _rememberMe.value = newValue!;
-                            },
-                          );
-                        },
-                      ),
-                      const Text('Remember me?', style: TextStyle(color: Colors.black)),
-                    ],
-                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -161,6 +160,22 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: _login,
                     child: const Text('Login', style: TextStyle(color: Colors.white)),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: _loginAsGuest,
+                    child: const Text(
+                      'Continue as Guest',
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: _loginAsShop,
+                    child: const Text(
+                      'Login as Shop',
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ),
                   ),
                 ],
               ),

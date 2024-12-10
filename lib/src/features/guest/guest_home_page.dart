@@ -4,28 +4,30 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:myguide_app/src/features/authentication/login_page.dart';
-import 'package:myguide_app/src/features/home/links/bestshops.dart';
-import 'package:myguide_app/src/features/home/links/favorites.dart';
-import 'package:myguide_app/src/features/home/links/reviews/review.dart';
-import 'package:myguide_app/src/features/shop/shop_page.dart'; // Importar a página de melhores lojas
+import 'package:myguide_app/src/features/shop/shop_page.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class GuestHomePage extends StatefulWidget {
+  const GuestHomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _GuestHomePageState createState() => _GuestHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _GuestHomePageState extends State<GuestHomePage> {
   List<dynamic> _shops = [];
   List<dynamic> _filteredShops = [];
   bool _isLoading = false;
   bool _hasMore = true;
   String _searchTerm = '';
-  int _selectedIndex = 0; // Controle do índice da aba selecionada
-  bool _isDarkMode = false; // Controle do tema (dark/light)
+  ThemeMode _themeMode = ThemeMode.system; // Default to system theme
 
-  // Função para fazer logout e limpar dados do usuário
+  @override
+  void initState() {
+    super.initState();
+    _fetchShops(); // Load shop data
+  }
+
+  // Function to log out and clear user data
   void _logout(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -33,7 +35,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Função para buscar dados da API
+  // Function to fetch shops from the API
   Future<void> _fetchShops() async {
     if (_isLoading || !_hasMore) return;
 
@@ -71,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Função para filtrar as lojas com base no termo de busca
+  // Function to filter shops based on the search term
   void _filterShops(String searchTerm) {
     setState(() {
       _searchTerm = searchTerm;
@@ -85,7 +87,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Função para navegar até os detalhes da loja
+  // Function to navigate to the shop details page
   void _navigateToShopDetail(dynamic shop) {
     Navigator.push(
       context,
@@ -95,55 +97,97 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Função para alternar o modo entre Dark e Light
+  // Function to toggle between light and dark theme
   void _toggleTheme() {
     setState(() {
-      _isDarkMode = !_isDarkMode;
+      _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
     });
   }
 
   @override
-  void initState() {
-    super.initState();
-    _fetchShops(); // Carrega os dados da API
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // Determina o tema com base no valor de _isDarkMode
-    final ThemeData theme = _isDarkMode ? ThemeData.dark() : ThemeData.light();
-
-    List<Widget> _pages = [
-      Scaffold( // Página inicial com lojas
-        backgroundColor: theme.colorScheme.background,
+    return MaterialApp(
+      title: 'MyGuide App',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: _themeMode, // Use the current themeMode state
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF273F57),
+          title: Padding(
+            padding: const EdgeInsets.only(left: 20.0), // Left padding
+            child: Text(
+              'MyGuide', // Title on the left
+              style: GoogleFonts.italianno(
+                fontSize: 72,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.exit_to_app, color: Colors.white),
+              onPressed: () {
+                _logout(context);
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.brightness_6, color: Colors.white),
+              onPressed: _toggleTheme, // Toggle between light and dark mode
+            ),
+          ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Color(0xFF273F57),
+                ),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ),
+              ListTile(
+                title: const Text('Home'),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const GuestHomePage()),
+                  );
+                },
+              ),
+              ListTile(
+                title: const Text('Favorites'),
+                onTap: () {
+                  // Navigate to favorites page
+                },
+              ),
+              ListTile(
+                title: const Text('Best Shops'),
+                onTap: () {
+                  // Navigate to best shops page
+                },
+              ),
+              ListTile(
+                title: const Text('Reviews'),
+                onTap: () {
+                  // Navigate to reviews page
+                },
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: const Color(0xFFE0E0E0),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: 10.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 50.0, right: 8.0),
-                      child: Image.asset(
-                        'assets/images/home/my.png',
-                        height: 150,
-                        width: 160,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Where are you going?',
-                  style: GoogleFonts.italianno(
-                    fontSize: 72,
-                    color: const Color(0xFF273F57),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
                 SizedBox(
-                  width: 500,
+                  width: MediaQuery.of(context).size.width * 0.8, // Responsive
                   child: TextField(
                     onChanged: _filterShops,
                     decoration: InputDecoration(
@@ -154,8 +198,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon: const Icon(Icons.search,
-                          color: Color(0xFF273F57)),
+                      prefixIcon: const Icon(Icons.search, color: Color(0xFF273F57)),
                     ),
                   ),
                 ),
@@ -176,7 +219,7 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
+                      crossAxisCount: 2,
                       childAspectRatio: 0.75,
                       crossAxisSpacing: 12.0,
                       mainAxisSpacing: 12.0,
@@ -184,8 +227,7 @@ class _HomePageState extends State<HomePage> {
                     itemCount: _filteredShops.length,
                     itemBuilder: (context, index) {
                       final shop = _filteredShops[index];
-                      final imageUrl =
-                          'https://picsum.photos/200/150?random=$index';
+                      final imageUrl = shop['imageUrl'] ?? 'https://picsum.photos/200/150?random=$index';
 
                       return GestureDetector(
                         onTap: () => _navigateToShopDetail(shop),
@@ -199,8 +241,7 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(20)),
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                                 child: Image.network(
                                   imageUrl,
                                   height: 120,
@@ -212,21 +253,14 @@ class _HomePageState extends State<HomePage> {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Text(
                                   shop['name'] ?? 'Unknown Shop',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0, vertical: 8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                                 child: Text(
                                   shop['address'] ?? 'Unknown address',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
+                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                                 ),
                               ),
                             ],
@@ -256,87 +290,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      ReviewsPage(), 
-      BestShopsPage(), 
-      FavoritesPage(),
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        backgroundColor: const Color(0xFF273F57),
-        iconTheme: const IconThemeData(color: Colors.white), // Ícone do menu em branco
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: const Text('User'),
-              accountEmail: const Text('user@example.com'),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.person,
-                  color: Colors.blue,
-                ),
-              ),
-            ),
-            ListTile(
-              title: const Text('Shops'),
-              leading: const Icon(Icons.store),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 0; // Navegar para a página de Shops
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Reviews'),
-              leading: const Icon(Icons.star),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 1; // Navegar para a página de Reviews
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Best Shops'),
-              leading: const Icon(Icons.invert_colors_on_sharp),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 2; // Navegar para a página de Best Shops
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Favorites'),
-              leading: const Icon(Icons.favorite),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 3; // Navegar para a página de Favorites
-                });
-                Navigator.pop(context);
-              },
-            ),
-            SwitchListTile(
-              title: const Text('Dark Mode'),
-              value: _isDarkMode,
-              onChanged: (value) {
-                _toggleTheme();
-              },
-            ),
-            ListTile(
-              title: const Text('Logout'),
-              leading: const Icon(Icons.exit_to_app),
-              onTap: () => _logout(context),
-            ),
-          ],
-        ),
-      ),
-      body: _pages[_selectedIndex], // Exibe a página baseada no índice selecionado
     );
   }
 }

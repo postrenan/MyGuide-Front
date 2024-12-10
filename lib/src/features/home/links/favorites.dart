@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 
-class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
+class BestShopsPage extends StatelessWidget {
+  const BestShopsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites',style: TextStyle(color:Colors.white,),),
+        title: const Text('Best Shops', style: TextStyle(color:Colors.white,),),
         backgroundColor: const Color(0xFF273F57),
         iconTheme: const IconThemeData(
           color:Colors.white,
@@ -17,27 +17,27 @@ class FavoritesPage extends StatelessWidget {
       backgroundColor: thirdColor,
       body: ListView(
         children: [
-          _buildFavoriteCard(
-            'Lugar Favorito 1',
-            'Descrição do lugar favorito 1.',
-            'assets/images/favorites/favorite_1.jpg',
+          _buildShopCard(
+            'Loja A',
+            'Uma loja incrível com produtos de alta qualidade.',
+            'assets/images/shops/shop_a.jpg',
           ),
-          _buildFavoriteCard(
-            'Lugar Favorito 2',
-            'Descrição do lugar favorito 2.',
-            'assets/images/favorites/favorite_2.jpg',
+          _buildShopCard(
+            'Loja B',
+            'Variedade de produtos e ótimo atendimento.',
+            'assets/images/shops/shop_b.jpg',
           ),
-          _buildFavoriteCard(
-            'Lugar Favorito 3',
-            'Descrição do lugar favorito 3.',
-            'assets/images/favorites/favorite_3.jpg',
+          _buildShopCard(
+            'Loja C',
+            'Preços acessíveis e produtos exclusivos.',
+            'assets/images/shops/shop_c.jpg',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFavoriteCard(String name, String description, String imagePath) {
+  Widget _buildShopCard(String name, String description, String imagePath) {
     return Card(
       margin: const EdgeInsets.all(10),
       child: Column(

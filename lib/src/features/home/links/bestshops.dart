@@ -1,49 +1,88 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:myguide_app/src/constants/colors.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class BestShopsPage extends StatelessWidget {
-  const BestShopsPage({super.key});
+class FavoritesPage extends StatefulWidget {
+  const FavoritesPage({super.key});
+
+  @override
+  _FavoritesPageState createState() => _FavoritesPageState();
+}
+
+class _FavoritesPageState extends State<FavoritesPage> {
+  late Future<List<Favorite>> favorites;
+
+  @override
+  void initState() {
+    super.initState();
+    favorites = fetchFavorites();
+  }
+
+  // Função para pegar os favoritos da API com base no ID do usuário
+  Future<List<Favorite>> fetchFavorites() async {
+    const userId = 1; // Substitua isso pelo ID do usuário autenticado
+    final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
+    final response = await http.get(Uri.parse('${apiUrl}favorites/$userId'));
+
+    if (response.statusCode == 200) {
+      // Se a resposta for bem-sucedida, parse os dados
+      List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Favorite.fromJson(json)).toList();
+    } else {
+      throw Exception('Falha ao carregar favoritos');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Best Shops', style: TextStyle(color:Colors.white,),),
+        title: const Text(
+          'Favorites',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF273F57),
         iconTheme: const IconThemeData(
-          color:Colors.white,
-        ),  // Azul
+          color: Colors.white,
+        ),
       ),
       backgroundColor: thirdColor,
-      body: ListView(
-        children: [
-          _buildShopCard(
-            'Loja A',
-            'Uma loja incrível com produtos de alta qualidade.',
-            'assets/images/shops/shop_a.jpg',
-          ),
-          _buildShopCard(
-            'Loja B',
-            'Variedade de produtos e ótimo atendimento.',
-            'assets/images/shops/shop_b.jpg',
-          ),
-          _buildShopCard(
-            'Loja C',
-            'Preços acessíveis e produtos exclusivos.',
-            'assets/images/shops/shop_c.jpg',
-          ),
-        ],
+      body: FutureBuilder<List<Favorite>>(
+        future: favorites,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            List<Favorite> favoriteList = snapshot.data!;
+            return ListView.builder(
+              itemCount: favoriteList.length,
+              itemBuilder: (context, index) {
+                return _buildFavoriteCard(
+                  favoriteList[index].name,
+                  favoriteList[index].description,
+                  favoriteList[index].imagePath,
+                );
+              },
+            );
+          } else {
+            return const Center(child: Text('Nenhum favorito encontrado.'));
+          }
+        },
       ),
     );
   }
 
-  Widget _buildShopCard(String name, String description, String imagePath) {
+  Widget _buildFavoriteCard(String name, String description, String imagePath) {
     return Card(
       margin: const EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(imagePath, fit: BoxFit.cover),
+          Image.network(imagePath, fit: BoxFit.cover),
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -66,3 +105,27 @@ class BestShopsPage extends StatelessWidget {
     );
   }
 }
+
+// Classe Favorite para mapear os dados recebidos da API
+class Favorite {
+  final String name;
+  final String description;
+  final String imagePath;
+
+  Favorite({
+    required this.name,
+    required this.description,
+    required this.imagePath,
+  });
+
+  // Método para converter o JSON da API em um objeto Favorite
+  factory Favorite.fromJson(Map<String, dynamic> json) {
+    return Favorite(
+      name: json['name'],
+      description: json['description'],
+      imagePath: json['imagePath'],
+    );
+  }
+}
+
+

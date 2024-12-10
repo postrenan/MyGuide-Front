@@ -20,11 +20,20 @@ dependencies:
   intl: ^0.18.0
   fluttertoast: ^8.2.8
   flutter_rating_bar: ^4.0.0
+  geolocator: ^13.0.2
+  geolocator_web: ^4.1.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.0.10
+  shared_preferences_web: ^2.0.0 
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  build_runner: ^2.3.3
+  hive_generator: ^1.1.0
 
 flutter:
   uses-material-design: true
