@@ -22,15 +22,38 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
   bool _isLoading = false;
   List<Map<String, dynamic>> _products = []; // Lista de produtos
 
+  String _shopId = ''; // ID da loja para buscar os dados
+
   // Função para carregar os dados da loja
   Future<void> _loadShopData() async {
-    // Aqui você pode carregar os dados da loja de uma API ou de armazenamento local
     setState(() {
-      _nameController.text = 'Nome da Loja'; // Exemplo de valor estático
-      _descriptionController.text = 'Descrição da Loja'; // Exemplo de valor estático
-      _openTimeController.text = '08:00'; // Exemplo de valor estático
-      _closeTimeController.text = '18:00'; // Exemplo de valor estático
+      _isLoading = true;
     });
+
+    try {
+      final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/'; 
+      final response = await http.get(Uri.parse('${apiUrl}shops/$_shopId'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          _nameController.text = data['name'];
+          _descriptionController.text = data['description'];
+          _openTimeController.text = data['openTime'];
+          _closeTimeController.text = data['closeTime'];
+        });
+      } else {
+        throw Exception('Failed to load shop data');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error loading shop data')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   // Função para carregar os produtos da loja
@@ -41,7 +64,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
 
     try {
       final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
-      final response = await http.get(Uri.parse('${apiUrl}shops/{shopId}/products')); // Substitua {shopId} pelo ID da loja
+      final response = await http.get(Uri.parse('${apiUrl}shops/$_shopId/products'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -71,7 +94,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
     try {
       final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
       final response = await http.put(
-        Uri.parse('${apiUrl}shops/{shopId}'), // Substitua {shopId} pelo ID da loja
+        Uri.parse('$apiUrl/shops/$_shopId'),
         body: {
           'name': _nameController.text,
           'description': _descriptionController.text,
@@ -114,7 +137,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
     try {
       final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
       final response = await http.post(
-        Uri.parse('${apiUrl}shops/{shopId}/products'), // Substitua {shopId} pelo ID da loja
+        Uri.parse('$apiUrl/shops/$_shopId/products'),
         body: {
           'name': _productNameController.text,
           'price': _productPriceController.text,
@@ -151,7 +174,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
     try {
       final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
       final response = await http.delete(
-        Uri.parse('${apiUrl}shops/{shopId}/products/$productId'), // Substitua {shopId} e $productId pelos respectivos IDs
+        Uri.parse('$apiUrl/shops/$_shopId/products/$productId'),
       );
 
       if (response.statusCode == 200) {
@@ -183,6 +206,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
   @override
   void initState() {
     super.initState();
+    _shopId = '123'; // Exemplo de shopId, substitua com a lógica de pegar o ID correto
     _loadShopData(); // Carregar os dados da loja ao iniciar
     _loadProducts(); // Carregar os produtos da loja ao iniciar
   }
@@ -206,7 +230,6 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Edit Shop Info
               const Text(
                 'Shop Information',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

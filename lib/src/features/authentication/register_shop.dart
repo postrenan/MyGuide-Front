@@ -16,7 +16,7 @@ class RegisterShop extends StatefulWidget {
 
 class _RegisterShopState extends State<RegisterShop> {
   bool _isPasswordVisible = false;
-  bool _isRepeatPasswordVisible = false;
+  final bool _isRepeatPasswordVisible = false;
   int _currentStep = 0;
 
   final TextEditingController _emailController = TextEditingController();
@@ -340,20 +340,20 @@ class _RegisterShopState extends State<RegisterShop> {
       obscureText: isPassword && !_isPasswordVisible,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.black), // Cor do texto do label
+        labelStyle: const TextStyle(color: Colors.black), // Cor do texto do label
         filled: true, // Adiciona cor de fundo
         fillColor: Colors.white, // Cor de fundo do campo
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30), // Bordas arredondadas
-          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
+          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
         ),
         suffixIcon: isPassword
             ? IconButton(
@@ -382,20 +382,20 @@ Widget _buildDropdownField({
       value: value,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.black), // Cor do texto do label
+        labelStyle: const TextStyle(color: Colors.black), // Cor do texto do label
         filled: true, // Adiciona cor de fundo
         fillColor: Colors.white, // Cor de fundo do campo
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30), // Bordas arredondadas
-          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
+          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
+          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
         ),
       ),
       items: items.map((String item) {

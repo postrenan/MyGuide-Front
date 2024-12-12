@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
-import 'package:myguide_app/src/features/home/page/homepage.dart'; // Página após o login
-import 'package:google_fonts/google_fonts.dart';
+import 'package:myguide_app/src/features/shop/shop_manager_page.dart'; // Página após o login
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:myguide_app/src/features/shop/shop_manager_page.dart';
 
 class ShopLoginPage extends StatefulWidget {
   const ShopLoginPage({super.key});
@@ -25,16 +24,82 @@ class _ShopLoginPageState extends State<ShopLoginPage> {
     super.dispose();
   }
 
-  // Função para realizar o login sem verificação de email e senha
-  void _login() {
-    // Simplesmente navega para a HomePage diretamente
-    if (!mounted) return;
-   // Após autenticação bem-sucedida de uma loja, navegue para a página de gerenciamento.
-   Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const ShopManagementPage()), // Sem passar o parâmetro 'shop'
-    );
+  // Função para realizar o login com a requisição ao endpoint 'shops'
+  Future<void> _login() async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
 
+    if (email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "Please enter both email and password",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    }
+
+    try {
+      String apiUrl = dotenv.env['API_URL'] ?? 'default_api_url'; // URL da API do backend
+
+      // Fazendo a requisição GET para obter a lista de lojas
+      final response = await http.get(
+        Uri.parse('${apiUrl}shops'),  // URL do endpoint de lojas
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> shops = jsonDecode(response.body);
+
+        // Verificando se algum shop tem email e senha correspondentes
+        bool isAuthenticated = false;
+        for (var shop in shops) {
+          if (shop['email'] == email && shop['password'] == password) {
+            isAuthenticated = true;
+            break;
+          }
+        }
+
+        if (isAuthenticated) {
+          // Se encontrar a loja, redireciona para a página de gerenciamento
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ShopManagementPage()),
+          );
+        } else {
+          // Caso o email e senha não sejam encontrados
+          Fluttertoast.showToast(
+            msg: "Invalid credentials, please try again.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      } else {
+        // Caso o servidor retorne um erro diferente de 200
+        Fluttertoast.showToast(
+          msg: "An error occurred. Please try again later.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e) {
+      // Caso ocorra um erro de rede ou outro erro inesperado
+      Fluttertoast.showToast(
+        msg: "An error occurred. Please try again.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
 
   @override
@@ -56,9 +121,9 @@ class _ShopLoginPageState extends State<ShopLoginPage> {
                 ),
               ),
               const SizedBox(height: 40),
-              _buildTextField("Email", _emailController, false), // Email removido da lógica de login
+              _buildTextField("Email", _emailController, false),
               const SizedBox(height: 20),
-              _buildTextField("Password", _passwordController, true), // Senha removida da lógica de login
+              _buildTextField("Password", _passwordController, true),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -68,7 +133,7 @@ class _ShopLoginPageState extends State<ShopLoginPage> {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 130, vertical: 20),
                 ),
-                onPressed: _login, // Função de login simplificada
+                onPressed: _login,
                 child: const Text('Login', style: TextStyle(color: Colors.white)),
               ),
             ],

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ShopPage extends StatelessWidget {
   final dynamic shop;
 
-  const ShopPage({Key? key, required this.shop}) : super(key: key);
+  const ShopPage({super.key, required this.shop});
 
   @override
   Widget build(BuildContext context) {

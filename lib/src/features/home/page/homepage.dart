@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<dynamic> _shops = [];
+  final List<dynamic> _shops = [];
   List<dynamic> _filteredShops = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -113,9 +113,9 @@ class _HomePageState extends State<HomePage> {
     // Determina o tema com base no valor de _isDarkMode
     final ThemeData theme = _isDarkMode ? ThemeData.dark() : ThemeData.light();
 
-    List<Widget> _pages = [
+    List<Widget> pages = [
       Scaffold( // Página inicial com lojas
-        backgroundColor: theme.colorScheme.background,
+        backgroundColor: theme.colorScheme.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -256,9 +256,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      ReviewsPage(), 
-      BestShopsPage(), 
-      FavoritesPage(),
+      const ReviewsPage(), 
+      const BestShopsPage(), 
+      const FavoritesPage(),
     ];
 
     return Scaffold(
@@ -270,9 +270,9 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: ListView(
           children: [
-            UserAccountsDrawerHeader(
-              accountName: const Text('User'),
-              accountEmail: const Text('user@example.com'),
+            const UserAccountsDrawerHeader(
+              accountName: Text('User'),
+              accountEmail: Text('user@example.com'),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(
@@ -336,7 +336,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _pages[_selectedIndex], // Exibe a página baseada no índice selecionado
+      body: pages[_selectedIndex], // Exibe a página baseada no índice selecionado
     );
   }
 }

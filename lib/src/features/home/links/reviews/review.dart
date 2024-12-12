@@ -195,9 +195,9 @@ class _ReviewsPageState extends State<ReviewsPage> {
                   ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddReviewModal, // Abre o modal para adicionar review
+        onPressed: _openAddReviewModal,
+        backgroundColor: const Color(0xFF273F57), // Abre o modal para adicionar review
         child: const Icon(Icons.add),
-        backgroundColor: const Color(0xFF273F57),
       ),
     );
   }

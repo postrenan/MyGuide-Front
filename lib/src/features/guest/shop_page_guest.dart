@@ -14,7 +14,7 @@ class GuestHomePage extends StatefulWidget {
 }
 
 class _GuestHomePageState extends State<GuestHomePage> {
-  List<dynamic> _shops = [];
+  final List<dynamic> _shops = [];
   List<dynamic> _filteredShops = [];
   bool _isLoading = false;
   bool _hasMore = true;
