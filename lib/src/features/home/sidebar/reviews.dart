@@ -51,7 +51,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
   }
 
   // Função para adicionar uma nova avaliação
-  Future<void> addReview(String title, String description, int picture) async {
+  Future<void> addReview(String title, String description) async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
     final response = await http.post(
       Uri.parse('${apiUrl}reviews'),
@@ -59,7 +59,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
       body: json.encode({
         'title': title,
         'description': description,
-        'picture': picture,
+        'picture': 1,  // Definindo o valor de picture como 1
         'shop': {
           'connect': {'id': selectedShopId}
         },
@@ -155,7 +155,6 @@ class _ReviewsPageState extends State<ReviewsPage> {
   void _showAddReviewDialog(BuildContext context) {
     final _titleController = TextEditingController();
     final _descriptionController = TextEditingController();
-    final _pictureController = TextEditingController();
 
     showDialog(
       context: context,
@@ -181,11 +180,6 @@ class _ReviewsPageState extends State<ReviewsPage> {
                     TextField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(labelText: 'Descrição'),
-                    ),
-                    TextField(
-                      controller: _pictureController,
-                      decoration: const InputDecoration(labelText: 'Imagem (ID)'),
-                      keyboardType: TextInputType.number,
                     ),
                     DropdownButton<int>(
                       hint: const Text('Selecione a loja'),
@@ -218,11 +212,10 @@ class _ReviewsPageState extends State<ReviewsPage> {
             ),
             TextButton(
               onPressed: () {
-                if (_pictureController.text.isNotEmpty) {
+                if (_titleController.text.isNotEmpty && _descriptionController.text.isNotEmpty) {
                   addReview(
                     _titleController.text,
                     _descriptionController.text,
-                    int.parse(_pictureController.text),
                   );
                   Navigator.of(context).pop();
                 }

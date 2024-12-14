@@ -15,10 +15,8 @@ class GuestHomePage extends StatefulWidget {
 
 class _GuestHomePageState extends State<GuestHomePage> {
   final List<dynamic> _shops = [];
-  List<dynamic> _filteredShops = [];
   bool _isLoading = false;
   bool _hasMore = true;
-  String _searchTerm = '';
   ThemeMode _themeMode = ThemeMode.system;
 
   @override
@@ -53,7 +51,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
         setState(() {
           _isLoading = false;
           _shops.addAll(newShops);
-          _filteredShops = _shops;
           _hasMore = newShops.length == 15;
         });
       } else {
@@ -71,19 +68,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     }
   }
 
-  void _filterShops(String searchTerm) {
-    setState(() {
-      _searchTerm = searchTerm;
-      if (searchTerm.isEmpty) {
-        _filteredShops = _shops;
-      } else {
-        _filteredShops = _shops.where((shop) {
-          return shop['name'].toLowerCase().contains(searchTerm.toLowerCase());
-        }).toList();
-      }
-    });
-  }
-
   void _navigateToShopDetail(dynamic shop) {
     Navigator.push(
       context,
@@ -95,7 +79,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
+      _themeMode =
+          (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
     });
   }
 
@@ -128,7 +113,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF273F57),
-        
           actions: [
             IconButton(
               icon: const Icon(Icons.exit_to_app, color: Colors.white),
@@ -148,26 +132,9 @@ class _GuestHomePageState extends State<GuestHomePage> {
             child: Column(
               children: [
                 const SizedBox(height: 10.0),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextField(
-                    onChanged: _filterShops,
-                    decoration: InputDecoration(
-                      hintText: 'Search',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                      prefixIcon: const Icon(Icons.search, color: Color(0xFF273F57)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                if (_isLoading && _filteredShops.isEmpty)
+                if (_isLoading && _shops.isEmpty)
                   const CircularProgressIndicator()
-                else if (_filteredShops.isEmpty)
+                else if (_shops.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
@@ -180,81 +147,132 @@ class _GuestHomePageState extends State<GuestHomePage> {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
-                      childAspectRatio: 0.75,
+                      childAspectRatio: 0.65,
                       crossAxisSpacing: 12.0,
                       mainAxisSpacing: 12.0,
                     ),
-                    itemCount: _filteredShops.length,
+                    itemCount: _shops.length,
                     itemBuilder: (context, index) {
-                      final shop = _filteredShops[index];
-                      final imageUrl = shop['imageUrl'] ?? 'https://picsum.photos/200/150?random=$index';
+                      final shop = _shops[index];
+                      final imageUrl = shop['imageUrl'] ??
+                          'https://picsum.photos/200/150?random=$index';
+                      final location = shop['location'] ?? {};
+                      final street = location['street'] ?? 'Unknown street';
+                      final city = location['city'] ?? 'Unknown city';
+                      final state = location['state'] ?? 'Unknown state';
+                      final country = location['country'] ?? 'Unknown country';
 
-                      return GestureDetector(
-                        onTap: () => _navigateToShopDetail(shop),
-                        child: Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          color: Theme.of(context).cardColor,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                                child: Image.network(
-                                  imageUrl,
-                                  height: 100,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
+                      return Card(
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        color: Theme.of(context).cardColor,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(20)),
+                              child: Image.network(
+                                imageUrl,
+                                height: 100,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Name: ${shop['name'] ?? 'Unknown Shop'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  shop['name'] ?? 'Unknown Shop',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text(
+                                'Description: ${shop['description'] ?? 'No description available'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 4.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Address:',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    'Street: $street',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  ),
+                                  Text(
+                                    'City: $city',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  ),
+                                  Text(
+                                    'State: $state',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Country: $country',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      shop['address'] ?? 'Unknown address',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Rating: ${shop['rating'] ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                                                               color: Theme.of(context).textTheme.bodySmall?.color,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Rating: ${shop['rating'] ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Theme.of(context).textTheme.bodySmall?.color,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       );
                     },

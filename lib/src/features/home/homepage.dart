@@ -4,10 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:myguide_app/src/features/authentication/login_page.dart';
-import 'package:myguide_app/src/features/home/sidebar/bestshops.dart';
-import 'package:myguide_app/src/features/home/sidebar/favorites.dart';
 import 'package:myguide_app/src/features/home/sidebar/reviews.dart';
-import 'package:myguide_app/src/features/shop/shop_page.dart'; // Importar a página de melhores lojas
+import 'package:myguide_app/src/features/shop/shop_page.dart'; // Importar a página de lojas
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -256,9 +254,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      const ReviewsPage(), 
-      const BestShopsPage(), 
-      const FavoritesPage(),
+      const ReviewsPage(), // Página de Reviews
     ];
 
     return Scaffold(
@@ -297,26 +293,6 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 setState(() {
                   _selectedIndex = 1; // Navegar para a página de Reviews
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Best Shops'),
-              leading: const Icon(Icons.invert_colors_on_sharp),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 2; // Navegar para a página de Best Shops
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Favorites'),
-              leading: const Icon(Icons.favorite),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 3; // Navegar para a página de Favorites
                 });
                 Navigator.pop(context);
               },
