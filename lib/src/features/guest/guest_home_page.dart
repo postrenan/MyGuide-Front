@@ -19,15 +19,14 @@ class _GuestHomePageState extends State<GuestHomePage> {
   bool _isLoading = false;
   bool _hasMore = true;
   String _searchTerm = '';
-  ThemeMode _themeMode = ThemeMode.system; // Default to system theme
+  ThemeMode _themeMode = ThemeMode.system;
 
   @override
   void initState() {
     super.initState();
-    _fetchShops(); // Load shop data
+    _fetchShops();
   }
 
-  // Function to log out and clear user data
   void _logout(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -35,7 +34,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     );
   }
 
-  // Function to fetch shops from the API
   Future<void> _fetchShops() async {
     if (_isLoading || !_hasMore) return;
 
@@ -73,7 +71,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     }
   }
 
-  // Function to filter shops based on the search term
   void _filterShops(String searchTerm) {
     setState(() {
       _searchTerm = searchTerm;
@@ -87,7 +84,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     });
   }
 
-  // Function to navigate to the shop details page
   void _navigateToShopDetail(dynamic shop) {
     Navigator.push(
       context,
@@ -97,7 +93,6 @@ class _GuestHomePageState extends State<GuestHomePage> {
     );
   }
 
-  // Function to toggle between light and dark theme
   void _toggleTheme() {
     setState(() {
       _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
@@ -108,22 +103,32 @@ class _GuestHomePageState extends State<GuestHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MyGuide App',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: _themeMode, // Use the current themeMode state
+      theme: ThemeData(
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF273F57),
+          background: Color(0xFFF5F5F5),
+        ),
+      ),
+      darkTheme: ThemeData(
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF1A1A2E),
+          background: Color(0xFF121212),
+          surface: Color(0xFF1F1F1F),
+          onSurface: Colors.white,
+        ),
+        cardColor: const Color(0xFF1E1E2C),
+        textTheme: GoogleFonts.poppinsTextTheme(
+          const TextTheme(
+            bodyMedium: TextStyle(color: Colors.white70),
+            bodySmall: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+      themeMode: _themeMode,
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF273F57),
-          title: Padding(
-            padding: const EdgeInsets.only(left: 20.0), // Left padding
-            child: Text(
-              'MyGuide', // Title on the left
-              style: GoogleFonts.italianno(
-                fontSize: 72,
-                color: Colors.white,
-              ),
-            ),
-          ),
+        
           actions: [
             IconButton(
               icon: const Icon(Icons.exit_to_app, color: Colors.white),
@@ -133,61 +138,18 @@ class _GuestHomePageState extends State<GuestHomePage> {
             ),
             IconButton(
               icon: const Icon(Icons.brightness_6, color: Colors.white),
-              onPressed: _toggleTheme, // Toggle between light and dark mode
+              onPressed: _toggleTheme,
             ),
           ],
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Color(0xFF273F57),
-                ),
-                child: Text(
-                  'Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
-              ),
-              ListTile(
-                title: const Text('Home'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const GuestHomePage()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Favorites'),
-                onTap: () {
-                  // Navigate to favorites page
-                },
-              ),
-              ListTile(
-                title: const Text('Best Shops'),
-                onTap: () {
-                  // Navigate to best shops page
-                },
-              ),
-              ListTile(
-                title: const Text('Reviews'),
-                onTap: () {
-                  // Navigate to reviews page
-                },
-              ),
-            ],
-          ),
-        ),
-        backgroundColor: const Color(0xFFE0E0E0),
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: 10.0),
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8, // Responsive
+                  width: MediaQuery.of(context).size.width * 0.8,
                   child: TextField(
                     onChanged: _filterShops,
                     decoration: InputDecoration(
@@ -219,7 +181,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+                      crossAxisCount: 3,
                       childAspectRatio: 0.75,
                       crossAxisSpacing: 12.0,
                       mainAxisSpacing: 12.0,
@@ -236,7 +198,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -244,7 +206,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                                 child: Image.network(
                                   imageUrl,
-                                  height: 120,
+                                  height: 100,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
@@ -253,14 +215,42 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Text(
                                   shop['name'] ?? 'Unknown Shop',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).textTheme.bodySmall?.color,
+                                  ),
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                                child: Text(
-                                  shop['address'] ?? 'Unknown address',
-                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      shop['address'] ?? 'Unknown address',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Rating: ${shop['rating'] ?? 'N/A'}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                                                               color: Theme.of(context).textTheme.bodySmall?.color,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Rating: ${shop['rating'] ?? 'N/A'}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(context).textTheme.bodySmall?.color,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -269,22 +259,11 @@ class _GuestHomePageState extends State<GuestHomePage> {
                       );
                     },
                   ),
-                if (_hasMore && !_isLoading)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: _fetchShops,
-                      child: const Text('Load more'),
-                    ),
+                if (_isLoading && _hasMore)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
                   ),
-                const SizedBox(height: 20.0),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    '© 2024 MyGuide App | All Rights Reserved',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
               ],
             ),
           ),

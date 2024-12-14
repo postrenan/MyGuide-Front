@@ -4,30 +4,28 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:myguide_app/src/features/authentication/login_page.dart';
-import 'package:myguide_app/src/features/shop/shop_page.dart';
+import 'package:myguide_app/src/features/home/sidebar/bestshops.dart';
+import 'package:myguide_app/src/features/home/sidebar/favorites.dart';
+import 'package:myguide_app/src/features/home/sidebar/reviews.dart';
+import 'package:myguide_app/src/features/shop/shop_page.dart'; // Importar a página de melhores lojas
 
-class GuestHomePage extends StatefulWidget {
-  const GuestHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  _GuestHomePageState createState() => _GuestHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _GuestHomePageState extends State<GuestHomePage> {
+class _HomePageState extends State<HomePage> {
   final List<dynamic> _shops = [];
   List<dynamic> _filteredShops = [];
   bool _isLoading = false;
   bool _hasMore = true;
   String _searchTerm = '';
-  ThemeMode _themeMode = ThemeMode.system; // Default to system theme
+  int _selectedIndex = 0; // Controle do índice da aba selecionada
+  bool _isDarkMode = false; // Controle do tema (dark/light)
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchShops(); // Load shop data
-  }
-
-  // Function to log out and clear user data
+  // Função para fazer logout e limpar dados do usuário
   void _logout(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -35,7 +33,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
     );
   }
 
-  // Function to fetch shops from the API
+  // Função para buscar dados da API
   Future<void> _fetchShops() async {
     if (_isLoading || !_hasMore) return;
 
@@ -73,7 +71,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
     }
   }
 
-  // Function to filter shops based on the search term
+  // Função para filtrar as lojas com base no termo de busca
   void _filterShops(String searchTerm) {
     setState(() {
       _searchTerm = searchTerm;
@@ -87,7 +85,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
     });
   }
 
-  // Function to navigate to the shop details page
+  // Função para navegar até os detalhes da loja
   void _navigateToShopDetail(dynamic shop) {
     Navigator.push(
       context,
@@ -97,86 +95,55 @@ class _GuestHomePageState extends State<GuestHomePage> {
     );
   }
 
-  // Function to toggle between light and dark theme
+  // Função para alternar o modo entre Dark e Light
   void _toggleTheme() {
     setState(() {
-      _themeMode = (_themeMode == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
+      _isDarkMode = !_isDarkMode;
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    _fetchShops(); // Carrega os dados da API
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MyGuide App',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: _themeMode, // Use the current themeMode state
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF273F57),
-          title: Padding(
-            padding: const EdgeInsets.only(left: 20.0), // Left padding
-            child: Text(
-              'MyGuide', // Title on the left
-              style: GoogleFonts.italianno(
-                fontSize: 72,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.exit_to_app, color: Colors.white),
-              onPressed: () {
-                _logout(context);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.brightness_6, color: Colors.white),
-              onPressed: _toggleTheme, // Toggle between light and dark mode
-            ),
-          ],
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Color(0xFF273F57),
-                ),
-                child: Text(
-                  'Menu',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
-              ),
-              ListTile(
-                title: const Text('Home'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const GuestHomePage()),
-                  );
-                },
-              ),
-              // Removed the "Favorites", "Best Shops", and "Reviews" buttons
-              ListTile(
-                title: const Text('Logout'),
-                onTap: () {
-                  _logout(context); // Perform logout
-                },
-              ),
-            ],
-          ),
-        ),
-        backgroundColor: const Color(0xFFE0E0E0),
+    // Determina o tema com base no valor de _isDarkMode
+    final ThemeData theme = _isDarkMode ? ThemeData.dark() : ThemeData.light();
+
+    List<Widget> pages = [
+      Scaffold( // Página inicial com lojas
+        backgroundColor: theme.colorScheme.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: 10.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 50.0, right: 8.0),
+                      child: Image.asset(
+                        'assets/images/home/my.png',
+                        height: 150,
+                        width: 160,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  'Where are you going?',
+                  style: GoogleFonts.italianno(
+                    fontSize: 72,
+                    color: const Color(0xFF273F57),
+                  ),
+                ),
+                const SizedBox(height: 20.0),
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8, // Responsive
+                  width: 500,
                   child: TextField(
                     onChanged: _filterShops,
                     decoration: InputDecoration(
@@ -187,7 +154,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon: const Icon(Icons.search, color: Color(0xFF273F57)),
+                      prefixIcon: const Icon(Icons.search,
+                          color: Color(0xFF273F57)),
                     ),
                   ),
                 ),
@@ -208,7 +176,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+                      crossAxisCount: 5,
                       childAspectRatio: 0.75,
                       crossAxisSpacing: 12.0,
                       mainAxisSpacing: 12.0,
@@ -216,7 +184,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     itemCount: _filteredShops.length,
                     itemBuilder: (context, index) {
                       final shop = _filteredShops[index];
-                      final imageUrl = shop['imageUrl'] ?? 'https://picsum.photos/200/150?random=$index';
+                      final imageUrl =
+                          'https://picsum.photos/200/150?random=$index';
 
                       return GestureDetector(
                         onTap: () => _navigateToShopDetail(shop),
@@ -230,7 +199,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(20)),
                                 child: Image.network(
                                   imageUrl,
                                   height: 120,
@@ -242,14 +212,21 @@ class _GuestHomePageState extends State<GuestHomePage> {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Text(
                                   shop['name'] ?? 'Unknown Shop',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0, vertical: 8.0),
                                 child: Text(
                                   shop['address'] ?? 'Unknown address',
-                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                             ],
@@ -279,6 +256,87 @@ class _GuestHomePageState extends State<GuestHomePage> {
           ),
         ),
       ),
+      const ReviewsPage(), 
+      const BestShopsPage(), 
+      const FavoritesPage(),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+        backgroundColor: const Color(0xFF273F57),
+        iconTheme: const IconThemeData(color: Colors.white), // Ícone do menu em branco
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const UserAccountsDrawerHeader(
+              accountName: Text('User'),
+              accountEmail: Text('user@example.com'),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.person,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Shops'),
+              leading: const Icon(Icons.store),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 0; // Navegar para a página de Shops
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Reviews'),
+              leading: const Icon(Icons.star),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 1; // Navegar para a página de Reviews
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Best Shops'),
+              leading: const Icon(Icons.invert_colors_on_sharp),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 2; // Navegar para a página de Best Shops
+                });
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Favorites'),
+              leading: const Icon(Icons.favorite),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 3; // Navegar para a página de Favorites
+                });
+                Navigator.pop(context);
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Dark Mode'),
+              value: _isDarkMode,
+              onChanged: (value) {
+                _toggleTheme();
+              },
+            ),
+            ListTile(
+              title: const Text('Logout'),
+              leading: const Icon(Icons.exit_to_app),
+              onTap: () => _logout(context),
+            ),
+          ],
+        ),
+      ),
+      body: pages[_selectedIndex], // Exibe a página baseada no índice selecionado
     );
   }
 }

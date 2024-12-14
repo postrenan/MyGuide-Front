@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/register_page.dart';
-import 'package:myguide_app/src/features/home/page/homepage.dart';
+import 'package:myguide_app/src/features/home/homepage.dart';
 import 'package:myguide_app/src/features/shop/shop_login_page.dart'; // Importando a página de login da shop
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;

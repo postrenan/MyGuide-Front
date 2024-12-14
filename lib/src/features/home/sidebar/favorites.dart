@@ -20,11 +20,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
     favorites = fetchFavorites();
   }
 
-  // Função para pegar os favoritos da API com base no ID do usuário
+  // Função para pegar os favoritos da API
   Future<List<Favorite>> fetchFavorites() async {
-    const userId = 1; // Substitua isso pelo ID do usuário autenticado
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:3000/';
-    final response = await http.get(Uri.parse('${apiUrl}favorites/$userId'));
+    final response = await http.get(Uri.parse('${apiUrl}favorites'));
 
     if (response.statusCode == 200) {
       // Se a resposta for bem-sucedida, parse os dados
@@ -39,10 +38,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Favorites',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Favoritos', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF273F57),
         iconTheme: const IconThemeData(
           color: Colors.white,
@@ -123,9 +119,7 @@ class Favorite {
     return Favorite(
       name: json['name'],
       description: json['description'],
-      imagePath: json['imagePath'],
+      imagePath: json['imagePath'], // Caminho para a imagem
     );
   }
 }
-
-
