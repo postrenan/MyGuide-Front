@@ -259,7 +259,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Home', style: TextStyle(color:Colors.white),),
         backgroundColor: const Color(0xFF273F57),
         iconTheme: const IconThemeData(color: Colors.white), // Ícone do menu em branco
       ),
@@ -291,10 +291,8 @@ class _HomePageState extends State<HomePage> {
               title: const Text('Reviews'),
               leading: const Icon(Icons.star),
               onTap: () {
-                setState(() {
-                  _selectedIndex = 1; // Navegar para a página de Reviews
-                });
                 Navigator.pop(context);
+                Navigator.pushNamed(context, '/home/review');
               },
             ),
             SwitchListTile(
