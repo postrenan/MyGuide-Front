@@ -33,7 +33,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
       List<dynamic> data = json.decode(response.body);
       return data.map((json) => Review.fromJson(json)).toList();
     } else {
-      throw Exception('Falha ao carregar as avaliações');
+      throw Exception('Fail to load reviews');
     }
   }
 
@@ -46,7 +46,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
       List<dynamic> data = json.decode(response.body);
       return data.map((json) => Shop.fromJson(json)).toList();
     } else {
-      throw Exception('Falha ao carregar as lojas');
+      throw Exception('Fail to load shops');
     }
   }
 
@@ -59,7 +59,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
       body: json.encode({
         'title': title,
         'description': description,
-        'picture': 1,  // Definindo o valor de picture como 1
+        'picture': 1, // Definindo o valor de picture como 1
         'shop': {
           'connect': {'id': selectedShopId}
         },
@@ -74,7 +74,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
         reviews = fetchReviews();
       });
     } else {
-      throw Exception('Falha ao adicionar a avaliação');
+      throw Exception('Fail to add a new review');
     }
   }
 
@@ -83,7 +83,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Reviews de Atrativos Turísticos',
+          'Reviews',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF273F57),
@@ -108,7 +108,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
               },
             );
           } else {
-            return const Center(child: Text('Nenhuma avaliação encontrada.'));
+            return const Center(child: Text('Not found reviews.'));
           }
         },
       ),
@@ -116,8 +116,8 @@ class _ReviewsPageState extends State<ReviewsPage> {
         onPressed: () {
           _showAddReviewDialog(context);
         },
-        child: const Icon(Icons.add),
         backgroundColor: const Color(0xFF273F57),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -143,90 +143,95 @@ class _ReviewsPageState extends State<ReviewsPage> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 5),
-            Text('Loja: ${review.shopName}', style: const TextStyle(color: Colors.grey)),
+            Text('Shop: ${review.shopName}',
+                style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 5),
-            Text('Usuário: ${review.userName} - ${review.userEmail}', style: const TextStyle(color: Colors.grey)),
           ],
         ),
       ),
     );
   }
+void _showAddReviewDialog(BuildContext context) {
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  int localSelectedShopId = selectedShopId; // Variável local para controlar a seleção no diálogo
 
-  void _showAddReviewDialog(BuildContext context) {
-    final _titleController = TextEditingController();
-    final _descriptionController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Adicionar Nova Avaliação'),
-          content: FutureBuilder<List<Shop>>(
-            future: shops,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Erro: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                List<Shop> shopList = snapshot.data!;
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(labelText: 'Título'),
-                    ),
-                    TextField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Descrição'),
-                    ),
-                    DropdownButton<int>(
-                      hint: const Text('Selecione a loja'),
-                      value: selectedShopId,
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedShopId = newValue!;
-                        });
-                      },
-                      items: shopList.map((shop) {
-                        return DropdownMenuItem<int>(
-                          value: shop.id,
-                          child: Text(shop.name),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Add new avaliation'),
+        content: FutureBuilder<List<Shop>>(
+          future: shops,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Erro: ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              List<Shop> shopList = snapshot.data!;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(labelText: 'Title'),
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                  ),
+                  DropdownButton<int>(
+                    hint: const Text('Select the shop'),
+                    value: localSelectedShopId, // Define o valor selecionado corretamente
+                    onChanged: (newValue) {
+                      setState(() {
+                        localSelectedShopId = newValue!; // Atualiza a seleção local
+                      });
+                    },
+                    items: shopList.map((shop) {
+                      return DropdownMenuItem<int>(
+                        value: shop.id,
+                        child: Text(shop.name),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
+            } else {
+              return const Center(child: Text('Shops not found.'));
+            }
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty &&
+                  descriptionController.text.isNotEmpty) {
+                setState(() {
+                  selectedShopId = localSelectedShopId; // Atualiza o estado global ao salvar
+                });
+                addReview(
+                  titleController.text,
+                  descriptionController.text,
                 );
-              } else {
-                return const Center(child: Text('Nenhuma loja encontrada.'));
+                Navigator.of(context).pop();
               }
             },
+            child: const Text('Add'),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (_titleController.text.isNotEmpty && _descriptionController.text.isNotEmpty) {
-                  addReview(
-                    _titleController.text,
-                    _descriptionController.text,
-                  );
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Adicionar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ],
+      );
+    },
+  );
+}
+
 }
 
 class Review {

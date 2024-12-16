@@ -91,13 +91,12 @@ class _GuestHomePageState extends State<GuestHomePage> {
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF273F57),
-          background: Color(0xFFF5F5F5),
+          surface: Color(0xFFF5F5F5),
         ),
       ),
       darkTheme: ThemeData(
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFF1A1A2E),
-          background: Color(0xFF121212),
           surface: Color(0xFF1F1F1F),
           onSurface: Colors.white,
         ),
@@ -126,7 +125,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
             ),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(

@@ -20,10 +20,9 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   bool _hasMore = true;
   String _searchTerm = '';
-  int _selectedIndex = 0; // Controle do índice da aba selecionada
-  bool _isDarkMode = false; // Controle do tema (dark/light)
+  int _selectedIndex = 0;
+  bool _isDarkMode = false;
 
-  // Função para fazer logout e limpar dados do usuário
   void _logout(BuildContext context) {
     Navigator.pushReplacement(
       context,
@@ -31,7 +30,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Função para buscar dados da API
   Future<void> _fetchShops() async {
     if (_isLoading || !_hasMore) return;
 
@@ -69,7 +67,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Função para filtrar as lojas com base no termo de busca
   void _filterShops(String searchTerm) {
     setState(() {
       _searchTerm = searchTerm;
@@ -83,7 +80,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Função para navegar até os detalhes da loja
   void _navigateToShopDetail(dynamic shop) {
     Navigator.push(
       context,
@@ -93,7 +89,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Função para alternar o modo entre Dark e Light
   void _toggleTheme() {
     setState(() {
       _isDarkMode = !_isDarkMode;
@@ -103,16 +98,15 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _fetchShops(); // Carrega os dados da API
+    _fetchShops();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Determina o tema com base no valor de _isDarkMode
     final ThemeData theme = _isDarkMode ? ThemeData.dark() : ThemeData.light();
 
     List<Widget> pages = [
-      Scaffold( // Página inicial com lojas
+      Scaffold(
         backgroundColor: theme.colorScheme.surface,
         body: SafeArea(
           child: SingleChildScrollView(
@@ -182,8 +176,13 @@ class _HomePageState extends State<HomePage> {
                     itemCount: _filteredShops.length,
                     itemBuilder: (context, index) {
                       final shop = _filteredShops[index];
-                      final imageUrl =
+                      final imageUrl = shop['imageUrl'] ??
                           'https://picsum.photos/200/150?random=$index';
+                      final location = shop['location'] ?? {};
+                      final street = location['street'] ?? 'Unknown street';
+                      final city = location['city'] ?? 'Unknown city';
+                      final state = location['state'] ?? 'Unknown state';
+                      final country = location['country'] ?? 'Unknown country';
 
                       return GestureDetector(
                         onTap: () => _navigateToShopDetail(shop),
@@ -220,11 +219,56 @@ class _HomePageState extends State<HomePage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0, vertical: 8.0),
                                 child: Text(
-                                  shop['address'] ?? 'Unknown address',
+                                  'Description: ${shop['description'] ?? 'No description available'}',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
                                   ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0, vertical: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Address:',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      'Street: $street',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      'City: $city',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      'State: $state',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      'Country: $country',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -254,14 +298,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      const ReviewsPage(), // Página de Reviews
+      const ReviewsPage(),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
         backgroundColor: const Color(0xFF273F57),
-        iconTheme: const IconThemeData(color: Colors.white), // Ícone do menu em branco
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: Drawer(
         child: ListView(
@@ -282,37 +326,34 @@ class _HomePageState extends State<HomePage> {
               leading: const Icon(Icons.store),
               onTap: () {
                 setState(() {
-                  _selectedIndex = 0; // Navegar para a página de Shops
+                  _selectedIndex = 0;
                 });
                 Navigator.pop(context);
               },
             ),
             ListTile(
               title: const Text('Reviews'),
-              leading: const Icon(Icons.star),
+              leading: const Icon(Icons.comment),
               onTap: () {
                 setState(() {
-                  _selectedIndex = 1; // Navegar para a página de Reviews
+                  _selectedIndex = 1;
                 });
                 Navigator.pop(context);
-              },
-            ),
-            SwitchListTile(
-              title: const Text('Dark Mode'),
-              value: _isDarkMode,
-              onChanged: (value) {
-                _toggleTheme();
               },
             ),
             ListTile(
               title: const Text('Logout'),
               leading: const Icon(Icons.exit_to_app),
-              onTap: () => _logout(context),
+              onTap: () {
+                _logout(context);
+              },
             ),
           ],
         ),
       ),
-      body: pages[_selectedIndex], // Exibe a página baseada no índice selecionado
+      body: pages[_selectedIndex],
     );
   }
 }
+
+
