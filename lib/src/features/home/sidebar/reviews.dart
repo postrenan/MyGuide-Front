@@ -83,7 +83,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Reviews',
+          'Tourist Attraction Reviews',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF273F57),
@@ -117,7 +117,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
           _showAddReviewDialog(context);
         },
         backgroundColor: const Color(0xFF273F57),
-        child: const Icon(Icons.add),
+         foregroundColor: Colors.white,
       ),
     );
   }

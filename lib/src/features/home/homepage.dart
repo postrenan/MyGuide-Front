@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Home', style: TextStyle(color:Colors.white),),
         backgroundColor: const Color(0xFF273F57),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -339,6 +339,7 @@ class _HomePageState extends State<HomePage> {
                   _selectedIndex = 1;
                 });
                 Navigator.pop(context);
+                Navigator.pushNamed(context, '/home/review');
               },
             ),
             ListTile(

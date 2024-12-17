@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myguide_app/src/constants/colors.dart';
 import 'package:myguide_app/src/features/authentication/register_page.dart';
 import 'package:myguide_app/src/features/home/homepage.dart';
-import 'package:myguide_app/src/features/shop/shop_login_page.dart'; // Importando a página de login da shop
+import 'package:myguide_app/src/features/shop/shop_login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -20,6 +20,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  
+  String _userName = ''; // Variável para armazenar o nome do usuário
+  String _userEmail = ''; // Variável para armazenar o e-mail do usuário
 
   @override
   void dispose() {
@@ -39,7 +42,14 @@ class _LoginPageState extends State<LoginPage> {
       final data = jsonDecode(response.body);
 
       // Verifica se a senha está correta
-      return data['password'] == _passwordController.text;
+      if (data['password'] == _passwordController.text) {
+        // Armazena os dados do usuário
+        setState(() {
+          _userName = data['name'];
+          _userEmail = data['email'];
+        });
+        return true;
+      }
     }
     return false;
   }
@@ -55,10 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     final loginSuccessful = await _loginUser();
     if (loginSuccessful) {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

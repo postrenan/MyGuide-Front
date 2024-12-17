@@ -1,4 +1,3 @@
-// shop_page.dart
 import 'package:flutter/material.dart';
 
 class ShopPage extends StatelessWidget {
@@ -10,8 +9,18 @@ class ShopPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(shop['name'] ?? 'Detalhes da Loja'),
+        title: Text(
+          shop['name'] ?? 'Detalhes da Loja',
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF273F57), // Azul
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: Colors.white, // Cor do botão de voltar
+          onPressed: () {
+            Navigator.pop(context); // Volta para a tela anterior
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

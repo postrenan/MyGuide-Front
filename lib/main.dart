@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:myguide_app/src/features/authentication/login_page.dart';
+import 'package:myguide_app/src/features/home/homepage.dart';
+import 'package:myguide_app/src/features/home/sidebar/reviews.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,13 +19,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SafeArea(
-          child: LoginPage(),
-        ),
-      ),
+
+      initialRoute: '/login',
+
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(), 
+        '/home/review': (context) => const ReviewsPage(), 
+      },
     );
   }
 }
