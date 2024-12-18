@@ -31,7 +31,8 @@ class _RegisterShopState extends State<RegisterShop> {
   final TextEditingController _openTimeController = TextEditingController();
   final TextEditingController _closeTimeController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
   final TextEditingController _stateController = TextEditingController();
 
   List<dynamic> _categories = [];
@@ -44,6 +45,58 @@ class _RegisterShopState extends State<RegisterShop> {
   void initState() {
     super.initState();
     _fetchCategories();
+  }
+
+  Future<void> _selectTime(
+      BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null) {
+      final now = DateTime.now();
+      final isoTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      ).toIso8601String();
+      setState(() {
+        controller.text = isoTime;
+      });
+    }
+  }
+
+  Widget _buildTimePickerField(
+      String label, double width, TextEditingController controller) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        controller: controller,
+        readOnly: true,
+        onTap: () => _selectTime(context, controller),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.black),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.orange, width: 2),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.orange, width: 2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.orange, width: 2),
+          ),
+          suffixIcon: const Icon(Icons.access_time),
+        ),
+      ),
+    );
   }
 
   Future<void> _fetchCategories() async {
@@ -65,80 +118,80 @@ class _RegisterShopState extends State<RegisterShop> {
   }
 
   Future<void> _createShopAccount() async {
-  if (_emailController.text.isEmpty ||
-      _shopNameController.text.isEmpty ||
-      _countryController.text.isEmpty ||
-      _cityController.text.isEmpty ||
-      _streetController.text.isEmpty ||
-      _numberController.text.isEmpty ||
-      _descriptionController.text.isEmpty ||
-      _openTimeController.text.isEmpty ||
-      _closeTimeController.text.isEmpty ||
-      _passwordController.text.isEmpty ||
-      _repeatPasswordController.text.isEmpty ||
-      _selectedCategoryId == null || // Verifique se o id da categoria foi selecionado
-      _stateController.text.isEmpty) {
-    _showMessage('Please fill all fields and select a category');
-    return;
-  }
+    if (_emailController.text.isEmpty ||
+        _shopNameController.text.isEmpty ||
+        _countryController.text.isEmpty ||
+        _cityController.text.isEmpty ||
+        _streetController.text.isEmpty ||
+        _numberController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        _openTimeController.text.isEmpty ||
+        _closeTimeController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _repeatPasswordController.text.isEmpty ||
+        _selectedCategoryId ==
+            null || // Verifique se o id da categoria foi selecionado
+        _stateController.text.isEmpty) {
+      _showMessage('Please fill all fields and select a category');
+      return;
+    }
 
-  if (_passwordController.text != _repeatPasswordController.text) {
-    _showMessage('Passwords do not match');
-    return;
-  }
+    if (_passwordController.text != _repeatPasswordController.text) {
+      _showMessage('Passwords do not match');
+      return;
+    }
 
-  try {
-    String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
+    try {
+      String apiKey = dotenv.env['API_URL'] ?? 'default_api_key';
 
-    final response = await http.post(
-      Uri.parse('${apiKey}shops'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'email': _emailController.text,
-        'name': _shopNameController.text,
-        'country': _countryController.text,
-        'city': _cityController.text,
-        'street': _streetController.text,
-        'number': int.tryParse(_numberController.text) ?? 0,
-        'description': _descriptionController.text,
-        'price': _selectedPrice,
-        'categoryId': _selectedCategoryId, // Envia o id da categoria
-        'products': int.tryParse(_productsController.text) ?? 0,
-        'openTime': _openTimeController.text,
-        'closeTime': _closeTimeController.text,
-        'password': _passwordController.text,
-        'state': _stateController.text,
-      }),
-    );
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      // Exibe a notificação de sucesso no canto inferior direito
-      Fluttertoast.showToast(
-        msg: "Shop account created successfully",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
+      final response = await http.post(
+        Uri.parse('${apiKey}shops'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'email': _emailController.text,
+          'name': _shopNameController.text,
+          'country': _countryController.text,
+          'city': _cityController.text,
+          'street': _streetController.text,
+          'number': int.tryParse(_numberController.text) ?? 0,
+          'description': _descriptionController.text,
+          'price': _selectedPrice,
+          'categoryId': _selectedCategoryId, // Envia o id da categoria
+          'products': int.tryParse(_productsController.text) ?? 0,
+          'openTime': _openTimeController.text,
+          'closeTime': _closeTimeController.text,
+          'password': _passwordController.text,
+          'state': _stateController.text,
+        }),
       );
-      // Redireciona para a página de login
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Exibe a notificação de sucesso no canto inferior direito
+        Fluttertoast.showToast(
+          msg: "Shop account created successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        // Redireciona para a página de login
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>  const LoginPage()),
-        );  // Certifique-se de ter configurado a rota '/login' no seu app
-    } else if (response.statusCode == 400) {
-      _showMessage('Invalid data. Please check your inputs.');
-    } else {
-      _showMessage('Error: ${response.statusCode}');
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        ); // Certifique-se de ter configurado a rota '/login' no seu app
+      } else if (response.statusCode == 400) {
+        _showMessage('Invalid data. Please check your inputs.');
+      } else {
+        _showMessage('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showMessage('An error occurred. Please try again.');
     }
-  } catch (e) {
-    _showMessage('An error occurred. Please try again.');
   }
-}
-
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -218,7 +271,8 @@ class _RegisterShopState extends State<RegisterShop> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -235,7 +289,8 @@ class _RegisterShopState extends State<RegisterShop> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -269,7 +324,8 @@ class _RegisterShopState extends State<RegisterShop> {
       children: [
         _buildTextField("Street", 350, _streetController),
         const SizedBox(height: 20),
-        _buildTextField("Number", 350, _numberController, inputType: TextInputType.number),
+        _buildTextField("Number", 350, _numberController,
+            inputType: TextInputType.number),
         const SizedBox(height: 20),
         _buildTextField("Description", 350, _descriptionController),
         const SizedBox(height: 20),
@@ -297,12 +353,16 @@ class _RegisterShopState extends State<RegisterShop> {
         const SizedBox(height: 20),
         _buildDropdownField(
           label: "Category",
-          value: _selectedCategoryName ?? _categories[0]['name'], // Valor padrão
-          items: _categories.map((category) => category['name'].toString()).toList(),
+          value:
+              _selectedCategoryName ?? _categories[0]['name'], // Valor padrão
+          items: _categories
+              .map((category) => category['name'].toString())
+              .toList(),
           onChanged: (value) {
             setState(() {
               // A categoria selecionada agora armazena o id
-              _selectedCategoryId = _categories.firstWhere((category) => category['name'] == value)['id'];
+              _selectedCategoryId = _categories
+                  .firstWhere((category) => category['name'] == value)['id'];
               _selectedCategoryName = value; // Exibe o nome da categoria
             });
           },
@@ -314,99 +374,111 @@ class _RegisterShopState extends State<RegisterShop> {
   Widget _buildStep3() {
     return Column(
       children: [
-        _buildTextField("Open Time", 350, _openTimeController),
+        _buildTimePickerField("Open Time", 350, _openTimeController),
         const SizedBox(height: 20),
-        _buildTextField("Close Time", 350, _closeTimeController),
+        _buildTimePickerField("Close Time", 350, _closeTimeController),
         const SizedBox(height: 20),
         _buildTextField("Password", 350, _passwordController, isPassword: true),
         const SizedBox(height: 20),
-        _buildTextField("Repeat Password", 350, _repeatPasswordController, isPassword: true),
+        _buildTextField("Repeat Password", 350, _repeatPasswordController,
+            isPassword: true),
       ],
     );
   }
 
- Widget _buildTextField(
-  String label,
-  double width,
-  TextEditingController controller, {
-  bool isPassword = false,
-  TextInputType inputType = TextInputType.text,
-}) {
-  return SizedBox(
-    width: width,
-    child: TextField(
-      controller: controller,
-      keyboardType: inputType,
-      obscureText: isPassword && !_isPasswordVisible,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.black), // Cor do texto do label
-        filled: true, // Adiciona cor de fundo
-        fillColor: Colors.white, // Cor de fundo do campo
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30), // Bordas arredondadas
-          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
-        ),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
-                onPressed: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
-              )
-            : null,
-      ),
-    ),
-  );
-}
-
-Widget _buildDropdownField({
-  required String label,
-  required String value,
-  required List<String> items,
-  required ValueChanged<String?> onChanged,
-}) {
-  return SizedBox(
-    width: 350, // Adicionando a mesma largura dos outros inputs
-    child: DropdownButtonFormField<String>(
-      value: value,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.black), // Cor do texto do label
-        filled: true, // Adiciona cor de fundo
-        fillColor: Colors.white, // Cor de fundo do campo
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30), // Bordas arredondadas
-          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.orange, width: 2), // Cor e espessura da borda quando focado
+  Widget _buildTextField(
+    String label,
+    double width,
+    TextEditingController controller, {
+    bool isPassword = false,
+    TextInputType inputType = TextInputType.text,
+  }) {
+    return SizedBox(
+      width: width,
+      child: TextField(
+        controller: controller,
+        keyboardType: inputType,
+        obscureText: isPassword && !_isPasswordVisible,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle:
+              const TextStyle(color: Colors.black), // Cor do texto do label
+          filled: true, // Adiciona cor de fundo
+          fillColor: Colors.white, // Cor de fundo do campo
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30), // Bordas arredondadas
+            borderSide: const BorderSide(
+                color: Colors.orange, width: 2), // Cor e espessura da borda
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+                color: Colors.orange, width: 2), // Cor e espessura da borda
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+                color: Colors.orange,
+                width: 2), // Cor e espessura da borda quando focado
+          ),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(_isPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                )
+              : null,
         ),
       ),
-      items: items.map((String item) {
-        return DropdownMenuItem<String>(
-          value: item,
-          child: Text(item),
-        );
-      }).toList(),
-      onChanged: onChanged,
-    ),
-  );
-}
+    );
+  }
 
+  Widget _buildDropdownField({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return SizedBox(
+      width: 350, // Adicionando a mesma largura dos outros inputs
+      child: DropdownButtonFormField<String>(
+        value: value,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle:
+              const TextStyle(color: Colors.black), // Cor do texto do label
+          filled: true, // Adiciona cor de fundo
+          fillColor: Colors.white, // Cor de fundo do campo
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30), // Bordas arredondadas
+            borderSide: const BorderSide(
+                color: Colors.orange, width: 2), // Cor e espessura da borda
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+                color: Colors.orange, width: 2), // Cor e espessura da borda
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(
+                color: Colors.orange,
+                width: 2), // Cor e espessura da borda quando focado
+          ),
+        ),
+        items: items.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(item),
+          );
+        }).toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
 }
